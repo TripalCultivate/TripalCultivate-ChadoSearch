@@ -7,7 +7,7 @@ COPY . /var/www/drupal/web/modules/contrib/chado_search
 WORKDIR /var/www/drupal/web/modules/contrib/chado_search
 
 RUN service postgresql start \
-  && drush en chado_search --yes \
+  && drush en chado_search example_ccsearch --yes \
   && drush tripal:trp-run-jobs --username=drupaladmin \
   && drush cr \
   && service postgresql stop

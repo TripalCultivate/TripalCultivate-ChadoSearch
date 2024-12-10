@@ -1,0 +1,9 @@
+name: "Chado Search API: EXAMPLE"
+type: module
+description: "Provides examples using the Chado Custom Search API."
+package: "Tripal Extensions"
+core_version_requirement: ^10 | ^11
+dependencies:
+  - "tripal:tripal"
+  - "tripal:tripal_chado"
+  - "chado_search:chado_search"
