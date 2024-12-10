@@ -58,7 +58,7 @@ final class ChadoSearch extends Plugin {
    *
    * @var string
    */
-  public readonly string $url_path;
+  public string $url_path;
 
   /**
    * Button label for the submit button at the bottom of the importer form.
