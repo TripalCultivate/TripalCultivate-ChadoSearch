@@ -1,4 +1,4 @@
 services:
-  plugin.manager.chado_search:
-    class: Drupal\chado_search\ChadoSearch\PluginManager\ChadoSearchPluginManager
+  chado_search.manager:
+    class: Drupal\chado_search\Services\ChadoSearchManager
     parent: default_plugin_manager
