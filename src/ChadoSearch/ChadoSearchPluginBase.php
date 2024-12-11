@@ -256,7 +256,7 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
       'caption' => '',
       'colgroups' => [],
       'sticky' => TRUE,
-      'empty' => '',
+      'empty' => 'No results matching the specified criteria were returned.',
     ];
     $table['header'] = [];
     $template_row = [];
@@ -311,8 +311,7 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
     }
 
     $form['results'] = [
-      '#type' => 'markup',
-      '#theme' => 'table',
+      '#type' => 'table',
       '#weight' => 30,
     ];
     foreach ($table as $key => $value) {
@@ -322,8 +321,6 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
 
   /**
    * Adds a pager to the form.
-   *
-   * @todo UPGRADE.
    *
    * @param array $form
    *   The form array to add the pager to.

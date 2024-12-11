@@ -3,3 +3,4 @@ search-form:
   css:
     theme:
       css/pager.css: {}
+      css/results.table.css: {}
