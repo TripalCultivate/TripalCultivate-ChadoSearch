@@ -118,10 +118,41 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
 
     // Set some defaults based on the class information.
     // @todo is this even needed.
-    foreach (static::$info['filters'] as $name => $details) {
+    foreach ($this->getDefinedFilters() as $name => $details) {
       $this->values[$name] = (isset($details['default'])) ? $details['default'] : NULL;
     }
     $this->submitted = FALSE;
+  }
+
+  /**
+   * Gets the fields defined for this search instance.
+   *
+   * These are used to define the table columns for the results and each item
+   * in the returned array maps to a result from the query.
+   *
+   * @return array
+   *   An array of fields defined for this instance where each item is keyed by
+   *   the chado column and the value is an array of details including a 'title'
+   *   and optional entity_link sub array.
+   */
+  public function getDefinedFields() {
+    return $this::$info['fields'];
+  }
+
+  /**
+   * Get the filters defined for this search instance.
+   *
+   * These are used in the where clause of the query to filter the results.
+   * Each machine name in the returned array should be used in the getQuery()
+   * method.
+   *
+   * @return array
+   *   An array of filters defined for this instance where each item is keyed by
+   *   its machine name and the value is an array of details including 'title'
+   *   and 'help'.
+   */
+  public function getDefinedFilters() {
+    return $this::$info['filters'];
   }
 
   /**
@@ -150,7 +181,7 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
       '#weight' => -10000,
     ];
 
-    foreach (static::$info['filters'] as $name => $details) {
+    foreach ($this->getDefinedFilters() as $name => $details) {
       $default = (isset($details['default'])) ? $details['default'] : '';
       if (isset($q[$name])) {
         $default = $q[$name];
@@ -209,7 +240,7 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
     $table['header'] = [];
     $template_row = [];
     $link = [];
-    foreach (static::$info['fields'] as $name => $details) {
+    foreach ($this->getDefinedFields() as $name => $details) {
       $label = $details['title'];
       $table['header'][$name] = $label;
       $template_row[$name] = '';
@@ -296,7 +327,7 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
     // -- Left: if we are not at the beginning then link to the previous page.
     if ($offset != 0) {
       // Determine the previous page info.
-      $prev_offset = $offset - $this::$num_items_per_page;
+      $prev_offset = $offset - $this->numItemsPerPage();
       if ($prev_offset < 0) {
         $prev_offset = 0;
       }
@@ -308,7 +339,7 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
       $params['page_num'] = $prev_page_num;
       $left_arrow = l(
         $left_arrow,
-        $this::$menu['path'],
+        $this->urlPath(),
         [
           'query' => $params,
           'html' => TRUE,
@@ -316,9 +347,9 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
       );
     }
     // -- Right: if we are not at the end then link to the next page.
-    if ($num_results > $this::$num_items_per_page) {
+    if ($num_results > $this->numItemsPerPage()) {
       // Determine the next page info.
-      $next_offset = $offset + $this::$num_items_per_page;
+      $next_offset = $offset + $this->numItemsPerPage();
       if ($next_offset < 0) {
         $next_offset = 0;
       }
@@ -330,7 +361,7 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
       $params['page_num'] = $next_page_num;
       $right_arrow = l(
         $right_arrow,
-        $this::$menu['path'],
+        $this->urlPath(),
         [
           'query' => $params,
           'html' => TRUE,
@@ -386,7 +417,7 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
 
     // For each filter value, either set the passed in value
     // or set the default.
-    foreach (static::$info['filters'] as $name => $details) {
+    foreach ($this->getDefinedFilters() as $name => $details) {
       if (isset($filter_values[$name])) {
         $this->values[$name] = $filter_values[$name];
       }
