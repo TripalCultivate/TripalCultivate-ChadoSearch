@@ -7,6 +7,7 @@ use Drupal\chado_search\Services\ChadoSearchManager;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\CurrentRouteMatch;
+use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -99,6 +100,7 @@ final class ChadoSearchForm extends FormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state, string|null $instance_id = NULL): array {
     $q = $this->route_match_service->getParameters()->getIterator();
+    dpm($q, 'q');
 
     // Get the instance for the search powering this form.
     $instance = $this->getChadoSearchInstance($instance_id);
@@ -180,8 +182,36 @@ final class ChadoSearchForm extends FormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state): void {
-    $this->messenger()->addStatus($this->t('The message has been sent.'));
-    $form_state->setRedirect('<front>');
+
+    // If we have values then we want to add them to the URL
+    // for bookmarking of searches.
+    $values = $form_state->getValues();
+    if (!empty($values)) {
+
+      // We want to add the value of each filter to the path.
+      $params = [];
+      foreach ($this->chado_search_instance->getDefinedFilters() as $name => $details) {
+        if (is_string($values[$name])) {
+          $params[$name] = trim($values[$name]);
+        }
+        elseif (is_array($values[$name])) {
+          foreach ($values[$name] as $key => $value) {
+            if (is_string($value)) {
+              $params[$name][$key] = trim($value);
+            }
+            elseif (is_array($value)) {
+              foreach ($value as $key2 => $value2) {
+                $params[$name][$key][$key2] = trim($value2);
+              }
+            }
+          }
+        }
+      }
+
+      $route_name = 'chado_search.form.' . $this->chado_search_instance->id();
+      $url = Url::fromRoute($route_name, $params);
+      $form_state->setRedirectUrl($url);
+    }
   }
 
 }

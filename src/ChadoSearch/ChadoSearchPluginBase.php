@@ -452,6 +452,13 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
   /**
    * {@inheritdoc}
    */
+  public function id(): string {
+    return $this->pluginDefinition['id'];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function label(): string {
     // Cast to a string since it is a TranslatableMarkup object.
     return (string) $this->pluginDefinition['title'];
