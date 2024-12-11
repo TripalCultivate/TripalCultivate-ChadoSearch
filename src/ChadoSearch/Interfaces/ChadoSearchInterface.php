@@ -19,7 +19,7 @@ interface ChadoSearchInterface {
    * @param int $offset
    *   The current offset. This is primarily used for pagers.
    */
-  public function getQuery(&$query, &$args, $offset);
+  public function getQuery(string &$query, array &$args, int $offset);
 
   /**
    * Returns the translated plugin label.

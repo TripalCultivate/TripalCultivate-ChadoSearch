@@ -56,21 +56,11 @@ final class ChadoSearchManager extends DefaultPluginManager {
     // For each instance... create a route object and add it to the list.
     foreach ($search_instances as $search_definition) {
       $route_name = 'chado_search.form.' . $search_definition['id'];
-      // The following route is equivalent to the YAML.
-      // ALLCAPS replaced by values from the ChadoSearch instances annotation.
-      // @code
-      // chado_search.form.ID:
-      //   path: URL_PATH
-      //   defaults:
-      //     _form: \Drupal\chado_search\Form\ChadoSearchForm
-      //     _title: TITLE
-      //   requirements:
-      //     _permission: PERMISSION[0]+PERMISSION[1]
-      // @endcode
       $routes[$route_name] = new Route(
         $search_definition['url_path'],
         [
           '_form' => '\Drupal\chado_search\Form\ChadoSearchForm',
+          'instance_id' => $search_definition['id'],
           '_title' => (string) $search_definition['title'],
         ],
         [
