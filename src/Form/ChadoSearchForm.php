@@ -100,7 +100,6 @@ final class ChadoSearchForm extends FormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state, string|null $instance_id = NULL): array {
     $q = $this->route_match_service->getParameters()->getIterator();
-    dpm($q, 'q');
 
     // Get the instance for the search powering this form.
     $instance = $this->getChadoSearchInstance($instance_id);
