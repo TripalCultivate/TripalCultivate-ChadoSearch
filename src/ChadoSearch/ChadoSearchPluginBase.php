@@ -6,7 +6,8 @@ use Drupal\chado_search\ChadoSearch\Interfaces\ChadoSearchInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\Form\FormState;
-use Drupal\Core\Routing\RouteMatch;
+use Drupal\Core\Routing\CurrentRouteMatch;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Base class for chado_search plugins.
@@ -71,9 +72,9 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
   /**
    * The route match service.
    *
-   * @var \Drupal\Core\Routing\RouteMatch
+   * @var \Drupal\Core\Routing\CurrentRouteMatch
    */
-  protected RouteMatch $route_match_service;
+  protected CurrentRouteMatch $route_match_service;
 
   /**
    * Implements ContainerFactoryPluginInterface->create().
@@ -107,10 +108,10 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
    *   The plugin_id for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Routing\RouteMatch $route_match
+   * @param \Drupal\Core\Routing\CurrentRouteMatch $route_match
    *   The route match service which is used to grab URL query parameters.
    */
-  public function __construct(array $configuration, string $plugin_id, mixed $plugin_definition, RouteMatch $route_match) {
+  public function __construct(array $configuration, string $plugin_id, mixed $plugin_definition, CurrentRouteMatch $route_match) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->route_match_service = $route_match;
@@ -141,7 +142,7 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
    *   The fully defined form to be rendered for the search.
    */
   public function form(array $form, FormState $form_state) {
-    $q = $this->route_match_service->getParameters();
+    $q = $this->route_match_service->getParameters()->getIterator();
 
     $form['header'] = [
       '#type' => 'markup',
@@ -283,7 +284,7 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
   public function addPager(array $form, int $num_results) {
 
     // Determine the current page and offset using the query parameters.
-    $q = $this->route_match_service->getParameters();
+    $q = $this->route_match_service->getParameters()->getIterator();
     $offset = (isset($q['offset'])) ? $q['offset'] : 0;
     $page_num = (isset($q['page_num'])) ? $q['page_num'] : 1;
 
