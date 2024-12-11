@@ -156,12 +156,12 @@ final class ChadoSearchForm extends FormBase {
       if (!is_numeric($offset)) {
         $offset = 0;
       }
-      // $results = $instance->getResults($offset);
+      $results = $instance->getResults($offset);
 
-      // if ($results !== FALSE) {
+      if ($results !== FALSE) {
         // $q['class'] = $class;
         // $instance->formatResults($form, $results);
-      // }
+      }
     }
 
     return $form;

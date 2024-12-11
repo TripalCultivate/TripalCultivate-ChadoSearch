@@ -7,6 +7,7 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Routing\CurrentRouteMatch;
+use Drupal\tripal_chado\Database\ChadoConnection;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -77,6 +78,13 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
   protected CurrentRouteMatch $route_match_service;
 
   /**
+   * The Tripal DBX Chado Connection.
+   *
+   * @var \Drupal\tripal_chado\Database\ChadoConnection
+   */
+  protected ChadoConnection $chado_connection;
+
+  /**
    * Implements ContainerFactoryPluginInterface->create().
    *
    * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
@@ -96,6 +104,7 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
       $plugin_id,
       $plugin_definition,
       $container->get('current_route_match'),
+      $container->get('tripal_chado.database'),
     );
   }
 
@@ -110,11 +119,14 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
    *   The plugin implementation definition.
    * @param \Drupal\Core\Routing\CurrentRouteMatch $route_match
    *   The route match service which is used to grab URL query parameters.
+   * @param \Drupal\tripal_chado\Database\ChadoConnection $chado_connection
+   *   The Tripal DBX Chado Connection service.
    */
-  public function __construct(array $configuration, string $plugin_id, mixed $plugin_definition, CurrentRouteMatch $route_match) {
+  public function __construct(array $configuration, string $plugin_id, mixed $plugin_definition, CurrentRouteMatch $route_match, ChadoConnection $chado_connection) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->route_match_service = $route_match;
+    $this->chado_connection = $chado_connection;
 
     // Set some defaults based on the class information.
     // @todo is this even needed.
@@ -446,8 +458,7 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
 
     // Execute it.
     if (!empty($query)) {
-      // @todo update this to the Tripal DBX API.
-      return chado_query($query, $args)->fetchAll();
+      return $this->chado_connection->query($query, $args)->fetchAll();
     }
     return FALSE;
   }

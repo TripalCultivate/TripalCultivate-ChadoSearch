@@ -82,14 +82,14 @@ class BreedingCrossSearch extends ChadoSearchPluginBase {
 
     $query = "SELECT
         child.name as child_name, mom.name as mom_name, dad.name as dad_name
-       FROM {stock} mom
-       LEFT JOIN {stock_relationship} relmom ON relmom.subject_id=mom.stock_id
-       LEFT JOIN {stock} child ON relmom.object_id=child.stock_id
-       LEFT JOIN {stock_relationship} reldad ON reldad.object_id=child.stock_id
-       LEFT JOIN {stock} dad ON dad.stock_id=reldad.subject_id
+       FROM {1:stock} mom
+       LEFT JOIN {1:stock_relationship} relmom ON relmom.subject_id=mom.stock_id
+       LEFT JOIN {1:stock} child ON relmom.object_id=child.stock_id
+       LEFT JOIN {1:stock_relationship} reldad ON reldad.object_id=child.stock_id
+       LEFT JOIN {1:stock} dad ON dad.stock_id=reldad.subject_id
        WHERE
-         relmom.type_id IN (SELECT cvterm_id FROM chado.cvterm WHERE name~'maternal') AND
-         reldad.type_id IN (SELECT cvterm_id FROM chado.cvterm WHERE name~'paternal')";
+         relmom.type_id IN (SELECT cvterm_id FROM {1:cvterm} WHERE name~'maternal') AND
+         reldad.type_id IN (SELECT cvterm_id FROM {1:cvterm} WHERE name~'paternal')";
 
     // Now we add the where arguments based on the filter results.
     // NOTE: make your placeholders match the key in the $filter_results array.
