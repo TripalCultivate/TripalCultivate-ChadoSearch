@@ -114,7 +114,10 @@ final class ChadoSearchForm extends FormBase {
 
     // Add CSS/JS as defined in the class. We do this here so that it can
     // be added to and/or altered in the form method.
-    // @todo add libraries to the form from the search instance.
+    $form['#attached']['library'][] = 'chado_search/search-form';
+    foreach ($instance->getLibraries() as $library) {
+      $form['#attached']['library'][] = $library;
+    }
 
     // Now let the instance add to the form.
     $form = $instance->form($form, $form_state);
@@ -159,8 +162,7 @@ final class ChadoSearchForm extends FormBase {
       $results = $instance->getResults($offset);
 
       if ($results !== FALSE) {
-        // $q['class'] = $class;
-        // $instance->formatResults($form, $results);
+        $instance->formatResults($form, $results);
       }
     }
 

@@ -16,16 +16,14 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchInterface, ContainerFactoryPluginInterface {
 
   /**
-   * Add CSS/JS to the form/results page.
+   * Add CSS/JS to the form/results page through libraries.
    *
-   * NOTE: paths supplied should be relative to $module.
+   * NOTE: the libraries listed here must already be defined in the
+   * libraries.yml file according to Drupal standards.
    *
    * @var array
    */
-  public static array $attached = [
-    'css' => [],
-    'js' => [],
-  ];
+  public static array $attached = [];
 
   /**
    * Information regarding the fields and filters for this search.
@@ -165,6 +163,17 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
    */
   public function getDefinedFilters() {
     return $this::$info['filters'];
+  }
+
+  /**
+   * Retrieves the CSS/JS libraries to attach to the form hosting this search.
+   *
+   * @return array
+   *   A simply list of libraries which must already be defined in the
+   *   libraries.yml.
+   */
+  public function getLibraries() {
+    return $this::$attached;
   }
 
   /**
@@ -381,32 +390,12 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
       );
     }
 
-    $form['pager_style'] = [
-      '#type' => 'markup',
-      '#markup' => '<style>
-      .pager-container {
-        width: 100%;
-        text-align: center;
-      }
-      .pager {
-        display: inline-block;
-      }
-      .pager-prev, .pager-next {
-        font-style: italic;
-      }
-      .pager-page {
-        font-weight: bold;
-        font-size: 1.1em;
-      }
-      </style>',
-    ];
-
     $form['pager'] = [
       '#type' => 'markup',
       '#markup' => '<span class="pager-prev">' . $left_arrow . '</span>'
       . '<span class="pager-page">' . ' - Page ' . $page_num . ' - ' . '</span>'
       . '<span class="pager-next">' . $right_arrow . '</span>',
-      '#prefix' => '<div class="pager-container"><div class="pager">',
+      '#prefix' => '<div class="chadosearch-pager-container"><div class="pager">',
       '#suffix' => '</div></div>',
       '#weight' => 100,
     ];

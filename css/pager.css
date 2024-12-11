@@ -1,0 +1,18 @@
+.chadosearch-pager-container {
+  width: 100%;
+  text-align: center;
+}
+
+.chadosearch-pager-container .pager {
+  display: inline-block;
+}
+
+.chadosearch-pager-container .pager-prev,
+.chadosearch-pager-container .pager-next {
+  font-style: italic;
+}
+
+.chadosearch-pager-container .pager-page {
+  font-weight: bold;
+  font-size: 1.1em;
+}
