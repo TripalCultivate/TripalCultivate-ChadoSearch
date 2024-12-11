@@ -3,13 +3,15 @@
 namespace Drupal\chado_search\ChadoSearch;
 
 use Drupal\chado_search\ChadoSearch\Interfaces\ChadoSearchInterface;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\Form\FormState;
+use Drupal\Core\Routing\RouteMatch;
 
 /**
  * Base class for chado_search plugins.
  */
-abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchInterface {
+abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchInterface, ContainerFactoryPluginInterface {
 
   /**
    * Add CSS/JS to the form/results page.
@@ -67,6 +69,36 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
   public bool $submitted = FALSE;
 
   /**
+   * The route match service.
+   *
+   * @var \Drupal\Core\Routing\RouteMatch
+   */
+  protected RouteMatch $route_match_service;
+
+  /**
+   * Implements ContainerFactoryPluginInterface->create().
+   *
+   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+   *   The Drupal service container.
+   * @param array $configuration
+   *   A configuration array containing information about the plugin instance.
+   * @param string $plugin_id
+   *   The plugin_id for the plugin instance.
+   * @param mixed $plugin_definition
+   *   The plugin implementation definition.
+   *
+   * @return static
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('current_route_match'),
+    );
+  }
+
+  /**
    * Constructor.
    *
    * @param array $configuration
@@ -75,9 +107,13 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
    *   The plugin_id for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
+   * @param \Drupal\Core\Routing\RouteMatch $route_match
+   *   The route match service which is used to grab URL query parameters.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition) {
+  public function __construct(array $configuration, string $plugin_id, mixed $plugin_definition, RouteMatch $route_match) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
+
+    $this->route_match_service = $route_match;
 
     // Set some defaults based on the class information.
     // @todo is this even needed.
@@ -96,8 +132,6 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
    *
    * Extend this method to alter the filter form.
    *
-   * @todo UPGRADE.
-   *
    * @param array $form
    *   The base form definition for the form elements to be added to.
    * @param \Drupal\Core\Form\FormState $form_state
@@ -107,15 +141,13 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
    *   The fully defined form to be rendered for the search.
    */
   public function form(array $form, FormState $form_state) {
-    // @todo upgrade drupal_get_query_parameters() to new approach.
-    $q = [];
+    $q = $this->route_match_service->getParameters();
 
-    // @todo upgrade to use annotation.
-    // $form['header'] = [
-    //   '#type' => 'markup',
-    //   '#markup' => '<p>' . self::$description . '</p>',
-    //   '#weight' => -10000,
-    // ];
+    $form['header'] = [
+      '#type' => 'markup',
+      '#markup' => '<p>' . $this->description() . '</p>',
+      '#weight' => -10000,
+    ];
 
     foreach (static::$info['filters'] as $name => $details) {
       $default = (isset($details['default'])) ? $details['default'] : '';
@@ -131,12 +163,11 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
       ];
     }
 
-    // @todo upgrade to use annotation.
-    // $form['submit'] = [
-    //   '#type' => 'submit',
-    //   '#value' => self::$button_text,
-    //   '#weight' => 20,
-    // ];
+    $form['submit'] = [
+      '#type' => 'submit',
+      '#value' => $this->buttonText(),
+      '#weight' => 20,
+    ];
 
     return $form;
   }
@@ -193,8 +224,7 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
     $num_rows = 0;
     foreach ($results as $r) {
       $num_rows++;
-      // @todo upgrade to use annotation.
-      if ($num_rows <= self::$num_items_per_page) {
+      if ($num_rows <= $this->numItemsPerPage()) {
         $row = [];
         foreach ($template_row as $key => $default) {
           if (isset($r->{$key})) {
@@ -223,8 +253,7 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
       }
     }
 
-    // @todo upgrade to use annotation.
-    if (self::$pager == TRUE) {
+    if ($this->usePager() == TRUE) {
       $form = $this->addPager($form, $num_rows);
     }
 
@@ -254,7 +283,7 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
   public function addPager(array $form, int $num_results) {
 
     // Determine the current page and offset using the query parameters.
-    $q = drupal_get_query_parameters();
+    $q = $this->route_match_service->getParameters();
     $offset = (isset($q['offset'])) ? $q['offset'] : 0;
     $page_num = (isset($q['page_num'])) ? $q['page_num'] : 1;
 
@@ -395,8 +424,67 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
    * {@inheritdoc}
    */
   public function label(): string {
-    // Cast the label to a string since it is a TranslatableMarkup object.
-    return (string) $this->pluginDefinition['label'];
+    // Cast to a string since it is a TranslatableMarkup object.
+    return (string) $this->pluginDefinition['title'];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function title(): string {
+    // Cast to a string since it is a TranslatableMarkup object.
+    return (string) $this->pluginDefinition['title'];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function description(): string {
+    // Cast to a string since it is a TranslatableMarkup object.
+    return (string) $this->pluginDefinition['description'];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function permissions(): array {
+    return $this->pluginDefinition['permissions'];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function urlPath(): string {
+    return $this->pluginDefinition['url_path'];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function buttonText(): string {
+    // Cast to a string since it is a TranslatableMarkup object.
+    return (string) $this->pluginDefinition['button_text'];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function requireSubmit(): bool {
+    return $this->pluginDefinition['require_submit'];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function usePager(): bool {
+    return $this->pluginDefinition['pager'];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function numItemsPerPage(): int {
+    return $this->pluginDefinition['num_items_per_page'];
   }
 
 }
