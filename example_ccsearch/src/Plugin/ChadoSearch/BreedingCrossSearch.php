@@ -2,6 +2,8 @@
 
 namespace Drupal\example_ccsearch\Plugin\ChadoSearch;
 
+use Drupal\chado_search\ChadoSearch\ChadoSearchPluginBase;
+
 /**
  * Creates an example search for breeding crosses using the chado search api.
  *
@@ -17,7 +19,7 @@ namespace Drupal\example_ccsearch\Plugin\ChadoSearch;
  *    num_items_per_page = 25,
  *  )
  */
-class BreedingCrossSearch extends TripalIdSpaceBase {
+class BreedingCrossSearch extends ChadoSearchPluginBase {
 
   /**
    * Information regarding the fields and filters for this search.
