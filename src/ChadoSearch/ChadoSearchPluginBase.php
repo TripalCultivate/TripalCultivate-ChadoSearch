@@ -59,7 +59,7 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
    *
    * @var array
    */
-  public array $values;
+  public array $values = [];
 
   /**
    * Whether the user clicked the search button.
@@ -135,48 +135,6 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
   }
 
   /**
-   * Gets the fields defined for this search instance.
-   *
-   * These are used to define the table columns for the results and each item
-   * in the returned array maps to a result from the query.
-   *
-   * @return array
-   *   An array of fields defined for this instance where each item is keyed by
-   *   the chado column and the value is an array of details including a 'title'
-   *   and optional entity_link sub array.
-   */
-  public function getDefinedFields() {
-    return $this::$info['fields'];
-  }
-
-  /**
-   * Get the filters defined for this search instance.
-   *
-   * These are used in the where clause of the query to filter the results.
-   * Each machine name in the returned array should be used in the getQuery()
-   * method.
-   *
-   * @return array
-   *   An array of filters defined for this instance where each item is keyed by
-   *   its machine name and the value is an array of details including 'title'
-   *   and 'help'.
-   */
-  public function getDefinedFilters() {
-    return $this::$info['filters'];
-  }
-
-  /**
-   * Retrieves the CSS/JS libraries to attach to the form hosting this search.
-   *
-   * @return array
-   *   A simply list of libraries which must already be defined in the
-   *   libraries.yml.
-   */
-  public function getLibraries() {
-    return $this::$attached;
-  }
-
-  /**
    * Generate the filter form.
    *
    * The base class will generate textfields for each filter defined in $info,
@@ -203,7 +161,7 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
     ];
 
     foreach ($this->getDefinedFilters() as $name => $details) {
-      $default = (isset($details['default'])) ? $details['default'] : '';
+
       if (isset($q[$name])) {
         $default = $q[$name];
       }
@@ -401,31 +359,6 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
   }
 
   /**
-   * Sets the values from the form based on user input.
-   *
-   * @param array $filter_values
-   *   An array of the user submitted values where the key matches an element
-   *   in the info['filter] array and the value is the value the user submitted
-   *   for that filter.
-   */
-  public function setValues($filter_values) {
-
-    // If we are setting values then we consider it submitted.
-    $this->submitted = TRUE;
-
-    // For each filter value, either set the passed in value
-    // or set the default.
-    foreach ($this->getDefinedFilters() as $name => $details) {
-      if (isset($filter_values[$name])) {
-        $this->values[$name] = $filter_values[$name];
-      }
-      else {
-        $this->values[$name] = (isset($details['default'])) ? $details['default'] : NULL;
-      }
-    }
-  }
-
-  /**
    * Uses the class defined query and values to retrieve the results.
    *
    * @param int $offset
@@ -447,6 +380,90 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
       return $this->chado_connection->query($query, $args)->fetchAll();
     }
     return FALSE;
+  }
+
+  /**
+   * Sets the values from the form based on user input.
+   *
+   * @param array $filter_values
+   *   An array of the user submitted values where the key matches an element
+   *   in the info['filter] array and the value is the value the user submitted
+   *   for that filter.
+   */
+  public function setValues($filter_values) {
+
+    // If we are setting values then we consider it submitted.
+    $this->submitted = TRUE;
+
+    // For each filter value, either set the passed in value
+    // or set the default.
+    foreach ($this->getDefinedFilters() as $name => $details) {
+      if (array_key_exists($name, $filter_values) && !empty($filter_values[$name])) {
+        $this->values[$name] = $filter_values[$name];
+      }
+      else {
+        $this->values[$name] = (isset($details['default'])) ? $details['default'] : NULL;
+      }
+    }
+  }
+
+  /**
+   * Get a specific value for this search's filter criteria.
+   *
+   * @param string $name
+   *   The name of the filter criteria you are interested in.
+   *
+   * @return mixed
+   *   The value for the specified filter criteria.
+   */
+  public function getValue(string $name) {
+    // If there are no values set yet then set the defaults at least.
+    if (empty($this->values)) {
+      $this->setValues([]);
+    }
+    return $this->values[$name];
+  }
+
+  /**
+   * Gets the fields defined for this search instance.
+   *
+   * These are used to define the table columns for the results and each item
+   * in the returned array maps to a result from the query.
+   *
+   * @return array
+   *   An array of fields defined for this instance where each item is keyed by
+   *   the chado column and the value is an array of details including a 'title'
+   *   and optional entity_link sub array.
+   */
+  public function getDefinedFields() {
+    return $this::$info['fields'];
+  }
+
+  /**
+   * Get the filters defined for this search instance.
+   *
+   * These are used in the where clause of the query to filter the results.
+   * Each machine name in the returned array should be used in the getQuery()
+   * method.
+   *
+   * @return array
+   *   An array of filters defined for this instance where each item is keyed by
+   *   its machine name and the value is an array of details including 'title'
+   *   and 'help'.
+   */
+  public function getDefinedFilters() {
+    return $this::$info['filters'];
+  }
+
+  /**
+   * Retrieves the CSS/JS libraries to attach to the form hosting this search.
+   *
+   * @return array
+   *   A simply list of libraries which must already be defined in the
+   *   libraries.yml.
+   */
+  public function getLibraries() {
+    return $this::$attached;
   }
 
   /**
