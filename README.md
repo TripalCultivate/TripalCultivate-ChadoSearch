@@ -23,7 +23,3 @@ Why might you want to use this module?
 1. Implement the ChadoSearch plugin type by creating a class extending ChadoSearchBase at `src/Plugin/ChadoSearch`. At a minimum you need to set the annotations, the $info property and the getQuery() method. See [BreedingCrossSearch](https://github.com/UofS-Pulse-Binfo/chado_custom_search/blob/master/example_ccsearch/srcPlugin/ChadoSearch/BreedingCrossSearch.inc) for an example.
 
 2. Clear the cache, navigate to the path defined in the class and enjoy your custom search!
-
-## Documentation
-
-For more information on what you can accomplish or how to get started, see [our ReadtheDocs Documentation](https://chado-custom-search-api.readthedocs.io/en/latest/#).
