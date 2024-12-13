@@ -22,6 +22,20 @@ use Drupal\chado_search\ChadoSearch\ChadoSearchPluginBase;
 class ChadoSearchBasicallyBase extends ChadoSearchPluginBase {
 
   /**
+   * Add CSS/JS to the form/results page through libraries.
+   *
+   * NOTE: the libraries listed here must already be defined in the
+   * libraries.yml file according to Drupal standards.
+   *
+   * @var array
+   */
+  public static array $attached = [
+    'library1',
+    'library2',
+    'library3',
+  ];
+
+  /**
    * Information regarding the fields and filters for this search.
    *
    * @var array

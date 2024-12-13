@@ -68,7 +68,11 @@ class PluginBaseTest extends ChadoTestKernelBase {
   }
 
   /**
-   * Test the checkIndices() function in the Validator Base class.
+   * Test the annotation getters in the Base Class.
+   *
+   * Note: I could have done a data provider but it would not have been as
+   * performant. Since these tests simply check the correct annotation is
+   * returned the performance hit did not seem worth it.
    */
   public function testBaseAnnotationGetters() {
 
@@ -82,6 +86,25 @@ class PluginBaseTest extends ChadoTestKernelBase {
       'require_submit' => TRUE,
       'pager' => TRUE,
       'num_items_per_page' => 25,
+    ];
+    $expected_libraries = ['library1', 'library2', 'library3'];
+    $expected_fields = [
+      'column1' => [
+        'title' => 'Column1',
+      ],
+      'column2' => [
+        'title' => 'Column2',
+      ],
+    ];
+    $expected_filters = [
+      'column1' => [
+        'title' => 'Column1',
+        'help' => 'The first filter.',
+      ],
+      'mom_name' => [
+        'title' => 'Column2',
+        'help' => 'The second filter.',
+      ],
     ];
 
     $configuration = [];
@@ -108,6 +131,16 @@ class PluginBaseTest extends ChadoTestKernelBase {
       $returned_value,
       "The title did not match what we expected based on the annotation set for ChadoSearchBasicallyBase.",
     );
+
+    // Label.
+    $returned_title = $returned_value;
+    $returned_value = $instance->label();
+    $this->assertEquals(
+      $expected_annotation['title'],
+      $returned_value,
+      "The title did not match what we expected based on the annotation set for ChadoSearchBasicallyBase.",
+    );
+    $this->assertEquals($returned_title, $returned_value, "The label should match the title that was returned.");
 
     // description.
     $returned_value = $instance->description();
@@ -163,6 +196,42 @@ class PluginBaseTest extends ChadoTestKernelBase {
       $expected_annotation['num_items_per_page'],
       $returned_value,
       "The Number of items per page did not match what we expected based on the annotation set for ChadoSearchBasicallyBase.",
+    );
+
+    // Libraries.
+    $returned_value = $instance->getLibraries();
+    $this->assertIsArray(
+      $returned_value,
+      "The libraries returned should be an array.",
+    );
+    $this->assertEquals(
+      $expected_libraries,
+      $returned_value,
+      "The libraries did not match what we expected based on the attached property set for ChadoSearchBasicallyBase.",
+    );
+
+    // Defined Fields.
+    $returned_value = $instance->getDefinedFields();
+    $this->assertIsArray(
+      $returned_value,
+      "The defined fields returned should be an array.",
+    );
+    $this->assertEquals(
+      $expected_fields,
+      $returned_value,
+      "The fields returned did not match what we expected based on the info property set for ChadoSearchBasicallyBase.",
+    );
+
+    // Defined Filters.
+    $returned_value = $instance->getDefinedFilters();
+    $this->assertIsArray(
+      $returned_value,
+      "The defined filters returned should be an array.",
+    );
+    $this->assertEquals(
+      $expected_filters,
+      $returned_value,
+      "The filters returned did not match what we expected based on the info property set for ChadoSearchBasicallyBase.",
     );
   }
 
