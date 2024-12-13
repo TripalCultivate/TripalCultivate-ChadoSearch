@@ -68,6 +68,49 @@ class PluginBaseTest extends ChadoTestKernelBase {
   }
 
   /**
+   * Tests dependency injection by checking the create() method works.
+   */
+  public function testCreateMethod() {
+
+    $configuration = [];
+    $plugin_id = 'basically_base';
+    $plugin_definition = [
+      'id' => "basically_base",
+      'title' => "Basically Base",
+      'description' => "A Fake plugin instance to test the base plugin class.",
+      'permissions' => ["access content"],
+      'url_path' => "search-fakers",
+      'button_text' => "Search",
+      'require_submit' => TRUE,
+      'pager' => TRUE,
+      'num_items_per_page' => 25,
+    ];
+
+    // First we create using the create() static method.
+    $created_by_create = ChadoSearchBasicallyBase::create(
+      $this->container,
+      $configuration,
+      $plugin_id,
+      $plugin_definition
+    );
+
+    // Second we create using the constructor and grabbing things from the
+    // container ourselves.
+    $created_by_constructor = new ChadoSearchBasicallyBase(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $this->chado_connection
+    );
+
+    $this->assertEquals(
+      $created_by_constructor,
+      $created_by_create,
+      "We should be able to create the object via the contructor or the create method equally."
+    );
+  }
+
+  /**
    * Test the annotation getters in the Base Class.
    *
    * Note: I could have done a data provider but it would not have been as
