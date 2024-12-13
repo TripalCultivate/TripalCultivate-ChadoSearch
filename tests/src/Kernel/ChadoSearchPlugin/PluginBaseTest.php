@@ -5,7 +5,6 @@ namespace Drupal\Tests\chado_search\Kernel\Validators;
 use Drupal\Tests\tripal_chado\Kernel\ChadoTestKernelBase;
 use Drupal\Tests\chado_search\Fixtures\ChadoSearchBasicallyBase;
 use Drupal\tripal_chado\Database\ChadoConnection;
-use Drupal\chado_search\Services\ChadoSearchManager;
 
 /**
  * Tests ChadoSearch Plugin Base functions.
@@ -16,25 +15,11 @@ use Drupal\chado_search\Services\ChadoSearchManager;
 class PluginBaseTest extends ChadoTestKernelBase {
 
   /**
-   * The Validators plugin manager for creating new validator instances.
-   *
-   * @var \Drupal\chado_search\Services\ChadoSearchManager
-   */
-  protected ChadoSearchManager $plugin_manager;
-
-  /**
    * A Database query interface for querying Chado using Tripal DBX.
    *
    * @var \Drupal\tripal_chado\Database\ChadoConnection
    */
   protected ChadoConnection $chado_connection;
-
-  /**
-   * Configuration.
-   *
-   * @var config_entity
-   */
-  private $config;
 
   /**
    * Modules to enable.
@@ -55,16 +40,10 @@ class PluginBaseTest extends ChadoTestKernelBase {
     // Set test environment.
     \Drupal::state()->set('is_a_test_environment', TRUE);
 
-    // Install module configuration.
-    $this->installConfig(['chado_search']);
-
     // Test Chado database.
     // Create a test chado instance and then set it in the container for use by
     // our service.
     $this->chado_connection = $this->createTestSchema(ChadoTestKernelBase::PREPARE_TEST_CHADO);
-
-    // Set plugin manager service.
-    $this->plugin_manager = \Drupal::service('chado_search.manager');
   }
 
   /**
