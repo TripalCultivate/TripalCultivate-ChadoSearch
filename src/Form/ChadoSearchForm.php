@@ -91,9 +91,12 @@ final class ChadoSearchForm extends FormBase {
    */
   public function getChadoSearchInstance(string $instance_id) {
 
-    // Get the instance using the plugin manager.
-    // We'll save it to a property for use later and also return it.
-    $this->chado_search_instance = $this->chado_search_manager->createInstance($instance_id);
+    if (!isset($this->chado_search_instance)) {
+      // Get the instance using the plugin manager.
+      // We'll save it to a property for use later and also return it.
+      $this->chado_search_instance = $this->chado_search_manager->createInstance($instance_id);
+    }
+
     return $this->chado_search_instance;
   }
 
