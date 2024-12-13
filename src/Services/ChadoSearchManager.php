@@ -15,7 +15,7 @@ use Symfony\Component\Routing\Route;
  * Creates search interfaces based on the information provided by specific
  * plugin instances including managing the form and route.
  */
-final class ChadoSearchManager extends DefaultPluginManager {
+class ChadoSearchManager extends DefaultPluginManager {
 
   /**
    * Constructs the ChadoSearchManager object.
