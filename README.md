@@ -20,27 +20,9 @@ Why might you want to use this module?
 
 ## Chado Custom Search API
 
-1. Implement `hook_chado_custom_search` to tell the API about the search you would like to create.
+1. Implement the ChadoSearch plugin type by creating a class extending ChadoSearchBase at `src/Plugin/ChadoSearch`. At a minimum you need to set the annotations, the $info property and the getQuery() method. See [BreedingCrossSearch](https://github.com/UofS-Pulse-Binfo/chado_custom_search/blob/master/example_ccsearch/srcPlugin/ChadoSearch/BreedingCrossSearch.inc) for an example.
 
-```php
-/**
- * Implement hook_chado_custom_search().
- *
- * This hook simply lists the machine name of the searches so that we can find
- * the info hook. We've done this for performance reasons.
- */
-function example_ccsearch_chado_custom_search() {
-  $searches = [];
-
-  $searches['BreedingCrossSearch'] = 'Breeding Cross Search';
-
-  return $searches;
-}
-```
-
-2. Create a class which extends ChadoCustomSearch. At a minimum you need to set the editable static constants and the getQuery() method. See [BreedingCrossSearch](https://github.com/UofS-Pulse-Binfo/chado_custom_search/blob/master/example_ccsearch/examples/BreedingCrossSearch.inc) for an example.
-
-3. Clear the cache, navigate to the path defined in the class and enjoy your custom search!
+2. Clear the cache, navigate to the path defined in the class and enjoy your custom search!
 
 ## Documentation
 
