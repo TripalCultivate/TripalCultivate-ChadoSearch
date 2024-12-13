@@ -6,9 +6,9 @@ use Drupal\chado_search\ChadoSearch\Interfaces\ChadoSearchInterface;
 use Drupal\chado_search\Services\ChadoSearchManager;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Routing\CurrentRouteMatch;
 use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Provides a Chado Search API form.
@@ -30,11 +30,13 @@ final class ChadoSearchForm extends FormBase {
   protected ChadoSearchInterface $chado_search_instance;
 
   /**
-   * The route match service.
+   * The requeststack service.
    *
-   * @var \Drupal\Core\Routing\CurrentRouteMatch
+   * Note: used to access current page requests.
+   *
+   * @var \Symfony\Component\HttpFoundation\RequestStack
    */
-  protected CurrentRouteMatch $route_match_service;
+  protected RequestStack $page_request_service;
 
   /**
    * {@inheritdoc}
@@ -53,7 +55,7 @@ final class ChadoSearchForm extends FormBase {
     $form = new static();
 
     $form->setChadoSearchManager($container->get('chado_search.manager'));
-    $form->setRouteMatchService($container->get('current_route_match'));
+    $form->setPageRequestService($container->get('request_stack'));
 
     return $form;
   }
@@ -69,13 +71,13 @@ final class ChadoSearchForm extends FormBase {
   }
 
   /**
-   * Sets the route match service.
+   * Sets the request stack service.
    *
-   * @param \Drupal\Core\Routing\CurrentRouteMatch $route_service
-   *   The route match service to be set.
+   * @param \Symfony\Component\HttpFoundation\RequestStack $request_service
+   *   The service used to access current page requests.
    */
-  public function setRouteMatchService(CurrentRouteMatch $route_service) {
-    $this->route_match_service = $route_service;
+  public function setPageRequestService(RequestStack $request_service) {
+    $this->page_request_service = $request_service;
   }
 
   /**
@@ -99,7 +101,7 @@ final class ChadoSearchForm extends FormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state, string|null $instance_id = NULL): array {
-    $q = $this->route_match_service->getParameters()->getIterator();
+    $query_params = $this->page_request_service->getCurrentRequest()->query;
 
     // Get the instance for the search powering this form.
     $instance = $this->getChadoSearchInstance($instance_id);
@@ -120,46 +122,44 @@ final class ChadoSearchForm extends FormBase {
       $form['#attached']['library'][] = $library;
     }
 
+    // Grab the values with priority for the form state,
+    // then the URL query parameters for backup.
+    $values = $form_state->getValues();
+    foreach ($instance->getDefinedFilters() as $name => $details) {
+      // Only if the form_state did not set this value...
+      if (!array_key_exists($name, $values)) {
+        // Then check to see if it is provided in the URL query parameters.
+        if ($query_params->has($name) && !empty($query_params->get($name))) {
+          $values[$name] = $query_params->get($name);
+        }
+      }
+    }
+    $instance->setValues($values);
+
+    // Next lets grab the offset and page information as well.
+    $offset = ($query_params->has('offset')) ? $query_params->get('offset') : 0;
+    if (is_numeric($offset)) {
+      $instance->setPagerOffset($offset);
+    }
+    $page_num = ($query_params->has('page_num')) ? $query_params->get('page_num') : 1;
+    if (is_numeric($page_num)) {
+      $instance->setCurrentPageNumber($page_num);
+    }
+
     // Now let the instance add to the form.
     $form = $instance->form($form, $form_state);
 
     // If we have values then we need to query!
     $doQuery = FALSE;
-    $values = $form_state->getValues();
     if (!empty($values)) {
       $doQuery = TRUE;
     }
     elseif ($instance->requireSubmit() == FALSE) {
       $doQuery = TRUE;
-
-      // Ensure that initial query takes into account URL parameters if present.
-      $values = [];
-      foreach ($instance->getDefinedFilters() as $name => $details) {
-        if (isset($q[$name])) {
-          $values[$name] = $q[$name];
-        }
-      }
-    }
-    elseif (!empty($q)) {
-      $doQuery = TRUE;
-
-      // Ensure that initial query takes into account URL parameters if present.
-      $values = [];
-      foreach ($instance->getDefinedFilters() as $name => $details) {
-        if (isset($q[$name])) {
-          $values[$name] = $q[$name];
-        }
-      }
     }
 
     if ($doQuery) {
 
-      $instance->setValues($values);
-
-      $offset = (isset($q['offset'])) ? $q['offset'] : 0;
-      if (!is_numeric($offset)) {
-        $offset = 0;
-      }
       $results = $instance->getResults($offset);
 
       if ($results !== FALSE) {

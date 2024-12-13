@@ -6,7 +6,6 @@ use Drupal\chado_search\ChadoSearch\Interfaces\ChadoSearchInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\Form\FormState;
-use Drupal\Core\Routing\CurrentRouteMatch;
 use Drupal\tripal_chado\Database\ChadoConnection;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -69,11 +68,19 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
   public bool $submitted = FALSE;
 
   /**
-   * The route match service.
+   * The current page of results being shown.
    *
-   * @var \Drupal\Core\Routing\CurrentRouteMatch
+   * @var int
    */
-  protected CurrentRouteMatch $route_match_service;
+  public int $pager_current_page = 1;
+
+  /**
+   * The offset to use in the query to show the current page of results.
+   *
+   * @var int
+   */
+  public int $pager_offset = 0;
+
 
   /**
    * The Tripal DBX Chado Connection.
@@ -101,7 +108,6 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('current_route_match'),
       $container->get('tripal_chado.database'),
     );
   }
@@ -115,22 +121,13 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
    *   The plugin_id for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Routing\CurrentRouteMatch $route_match
-   *   The route match service which is used to grab URL query parameters.
    * @param \Drupal\tripal_chado\Database\ChadoConnection $chado_connection
    *   The Tripal DBX Chado Connection service.
    */
-  public function __construct(array $configuration, string $plugin_id, mixed $plugin_definition, CurrentRouteMatch $route_match, ChadoConnection $chado_connection) {
+  public function __construct(array $configuration, string $plugin_id, mixed $plugin_definition, ChadoConnection $chado_connection) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
-    $this->route_match_service = $route_match;
     $this->chado_connection = $chado_connection;
-
-    // Set some defaults based on the class information.
-    // @todo is this even needed.
-    foreach ($this->getDefinedFilters() as $name => $details) {
-      $this->values[$name] = (isset($details['default'])) ? $details['default'] : NULL;
-    }
     $this->submitted = FALSE;
   }
 
@@ -151,8 +148,7 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
    * @return array
    *   The fully defined form to be rendered for the search.
    */
-  public function form(array $form, FormState $form_state) {
-    $q = $this->route_match_service->getParameters()->getIterator();
+  public function form(array $form, FormState $form_state): array {
 
     $form['header'] = [
       '#type' => 'markup',
@@ -161,16 +157,11 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
     ];
 
     foreach ($this->getDefinedFilters() as $name => $details) {
-
-      if (isset($q[$name])) {
-        $default = $q[$name];
-      }
-
       $form[$name] = [
         '#type' => 'textfield',
         '#title' => $details['title'],
         '#description' => $details['help'],
-        '#default_value' => $default,
+        '#default_value' => $this->getValue($name),
       ];
     }
 
@@ -193,7 +184,7 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
    * @param \Drupal\Core\Form\FormState $form_state
    *   The current state of the form.
    */
-  public function validateForm(array $form, FormState $form_state) {
+  public function validateForm(array $form, FormState $form_state): void {
   }
 
   /**
@@ -207,7 +198,7 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
    *   The results to format. This will be an array of standard objects where
    *   the keys map to the keys in $info['fields'].
    */
-  public function formatResults(array &$form, array $results) {
+  public function formatResults(array &$form, array $results): void {
 
     $table = [
       'attributes' => [],
@@ -240,18 +231,7 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
         foreach ($template_row as $key => $default) {
           if (isset($r->{$key})) {
             $row[$key] = $r->{$key};
-            if ($link[$key]['entity_link']) {
-              $entity_id = chado_get_record_entity_by_table(
-                $link[$key]['entity_link']['chado_table'],
-                $r->{$link[$key]['entity_link']['id_column']}
-              );
-              if ($entity_id) {
-                $row[$key] = l($r->{$key}, '/bio_data/' . $entity_id);
-              }
-              else {
-                $row[$key] = $r->{$key};
-              }
-            }
+            // @todo implement support for entity links.
           }
           else {
             $row[$key] = '';
@@ -288,16 +268,23 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
    * @return array
    *   The original form with the pager added.
    */
-  public function addPager(array $form, int $num_results) {
+  public function addPager(array $form, int $num_results): array {
 
     // Determine the current page and offset using the query parameters.
-    $q = $this->route_match_service->getParameters()->getIterator();
-    $offset = (isset($q['offset'])) ? $q['offset'] : 0;
-    $page_num = (isset($q['page_num'])) ? $q['page_num'] : 1;
+    $offset = $this->getPagerOffset();
+    $page_num = $this->getCurrentPageNumber();
 
     // HTML codes for the left/right arrow.
     $left_arrow = '&#8249;previous';
     $right_arrow = 'next&#8250;';
+
+    // URL Parameters based on non-empty values.
+    $query_params = [];
+    foreach ($this->getValues() as $name => $value) {
+      if (!empty($value)) {
+        $query_params[$name] = $value;
+      }
+    }
 
     // Turn left/right arrow into a link if appropriate.
     // -- Left: if we are not at the beginning then link to the previous page.
@@ -310,7 +297,7 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
       $prev_page_num = ($prev_offset == 0) ? 1 : $page_num - 1;
 
       // Create a link to the prev page.
-      $params = $q;
+      $params = $query_params;
       $params['offset'] = $prev_offset;
       $params['page_num'] = $prev_page_num;
       $left_arrow = l(
@@ -332,7 +319,7 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
       $next_page_num = ($next_offset == 0) ? 1 : $page_num + 1;
 
       // Create a link to the next page.
-      $params = $q;
+      $params = $query_params;
       $params['offset'] = $next_offset;
       $params['page_num'] = $next_page_num;
       $right_arrow = l(
@@ -368,7 +355,7 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
    *   Either an array of the results returned by the query, adjusted by the
    *   offset OR False if an error is encountered.
    */
-  public function getResults($offset) {
+  public function getResults($offset): array|FALSE {
 
     // Grab the query defined for this specific child.
     $query = '';
@@ -383,6 +370,26 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
   }
 
   /**
+   * Sets the paging offset.
+   *
+   * @param int $offset
+   *   The offset to use in the query to support paging.
+   */
+  public function setPagerOffset(int $offset): void {
+    $this->pager_offset = $offset;
+  }
+
+  /**
+   * Sets the current page to support the pager.
+   *
+   * @param int $page_number
+   *   The current page of results to show.
+   */
+  public function setCurrentPageNumber(int $page_number): void {
+    $this->pager_current_page = $page_number;
+  }
+
+  /**
    * Sets the values from the form based on user input.
    *
    * @param array $filter_values
@@ -390,7 +397,7 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
    *   in the info['filter] array and the value is the value the user submitted
    *   for that filter.
    */
-  public function setValues($filter_values) {
+  public function setValues($filter_values): void {
 
     // If we are setting values then we consider it submitted.
     $this->submitted = TRUE;
@@ -408,6 +415,41 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
   }
 
   /**
+   * Returns the query offset used in paging.
+   *
+   * @return int
+   *   The query offset.
+   */
+  public function getPagerOffset(): int {
+    return $this->pager_offset;
+  }
+
+  /**
+   * Returns the current page number of results to show.
+   *
+   * @return int
+   *   The current page number.
+   */
+  public function getCurrentPageNumber(): int {
+    return $this->pager_current_page;
+  }
+
+  /**
+   * Returns all the filter values for this search.
+   *
+   * @return array
+   *   An array of filter values where the key is the machine name of the filter
+   *   and the value is it's value.
+   */
+  public function getValues(): array {
+    // If there are no values set yet then set the defaults at least.
+    if (empty($this->values)) {
+      $this->setValues([]);
+    }
+    return $this->values;
+  }
+
+  /**
    * Get a specific value for this search's filter criteria.
    *
    * @param string $name
@@ -416,7 +458,7 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
    * @return mixed
    *   The value for the specified filter criteria.
    */
-  public function getValue(string $name) {
+  public function getValue(string $name): mixed {
     // If there are no values set yet then set the defaults at least.
     if (empty($this->values)) {
       $this->setValues([]);
@@ -435,7 +477,7 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
    *   the chado column and the value is an array of details including a 'title'
    *   and optional entity_link sub array.
    */
-  public function getDefinedFields() {
+  public function getDefinedFields(): array {
     return $this::$info['fields'];
   }
 
@@ -451,7 +493,7 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
    *   its machine name and the value is an array of details including 'title'
    *   and 'help'.
    */
-  public function getDefinedFilters() {
+  public function getDefinedFilters(): array {
     return $this::$info['filters'];
   }
 
@@ -462,7 +504,7 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
    *   A simply list of libraries which must already be defined in the
    *   libraries.yml.
    */
-  public function getLibraries() {
+  public function getLibraries(): array {
     return $this::$attached;
   }
 
