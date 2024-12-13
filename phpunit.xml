@@ -79,6 +79,9 @@
     <testsuite name="functional">
       <directory>tests/src/Functional</directory>
     </testsuite>
+    <testsuite name="kernel">
+      <directory>tests/src/Kernel</directory>
+    </testsuite>
   </testsuites>
   <!-- Settings for coverage reports. -->
   <source ignoreSuppressionOfDeprecations="true">
