@@ -59,7 +59,22 @@ maintainability. There are more details on [our CodeClimate project page]
 describing our specific maintainability issues and test coverage.
 
 [![Maintainability](https://api.codeclimate.com/v1/badges/69080fdb30c5c3a46350/maintainability)](https://codeclimate.com/github/UofS-Pulse-Binfo/chado_custom_search/maintainability)
-
 [![Test Coverage](https://api.codeclimate.com/v1/badges/69080fdb30c5c3a46350/test_coverage)](https://codeclimate.com/github/UofS-Pulse-Binfo/chado_custom_search/test_coverage)
 
+The following compatibility is proven via automated testing workflows.
+
+|  Drupal     |  10.5.x         | 11.0.x          | 11.1.x          |
+|-------------|-----------------|-----------------|-----------------|
+| **PHP 8.1** | ![Grid1A-Badge] |                 |                 |
+| **PHP 8.2** | ![Grid1B-Badge] |                 |                 |
+| **PHP 8.3** | ![Grid1C-Badge] | ![Grid2C-Badge] | ![Grid3C-Badge] |
+
 [our CodeClimate project page]: https://codeclimate.com/github/UofS-Pulse-Binfo/chado_custom_search
+
+[Grid1A-Badge]: https://github.com/UofS-Pulse-Binfo/chado_custom_search/actions/workflows/MAIN-phpunit-Grid1A.yml/badge.svg
+[Grid1B-Badge]: https://github.com/UofS-Pulse-Binfo/chado_custom_search/actions/workflows/MAIN-phpunit-Grid1B.yml/badge.svg
+[Grid1C-Badge]: https://github.com/UofS-Pulse-Binfo/chado_custom_search/actions/workflows/MAIN-phpunit-Grid1C.yml/badge.svg
+
+[Grid2C-Badge]: https://github.com/UofS-Pulse-Binfo/chado_custom_search/actions/workflows/MAIN-phpunit-Grid2C.yml/badge.svg
+
+[Grid3C-Badge]: https://github.com/UofS-Pulse-Binfo/chado_custom_search/actions/workflows/MAIN-phpunit-Grid3C.yml/badge.svg
