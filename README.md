@@ -26,9 +26,13 @@ Why might you want to use this module?
 
 ## Citation
 
-If you use this module in your Tripal site, please use this citation to reference our work any place where you described your resulting Tripal site. For example, if you publish your site in a journal then this citation should be in the reference section and anywhere functionality provided by this module is discussed in the above text should reference it.
+If you use this module in your Tripal site, please use this citation to
+reference our work any place where you described your resulting Tripal site.
+For example, if you publish your site in a journal then this citation should be
+in the reference section and anywhere functionality provided by this module is
+discussed in the above text should reference it.
 
-> Lacey-Anne Sanderson, Carolyn Caron, Reynold Tan, Ruobin Liu, Kirstin Bett (2024). Tripal Cultivate -Sharing data for smarter agriculture!. Development Version. University of Saskatchewan, Pulse Crop Research Group, Saskatoon, SK, Canada.
+> Lacey-Anne Sanderson (2024). Chado Search API. Development Version. University of Saskatchewan, Pulse Crop Research Group, Saskatoon, SK, Canada.
 
 ## Technology Stack
 
