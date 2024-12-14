@@ -123,7 +123,7 @@ class PluginBaseTest extends ChadoTestKernelBase {
         'title' => 'Column1',
         'help' => 'The first filter.',
       ],
-      'mom_name' => [
+      'column2' => [
         'title' => 'Column2',
         'help' => 'The second filter.',
       ],
