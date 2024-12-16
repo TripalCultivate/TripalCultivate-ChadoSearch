@@ -14,7 +14,7 @@ use Drupal\chado_search\ChadoSearch\ChadoSearchPluginBase;
  *    permissions = {"access content"},
  *    url_path = "search-fakers",
  *    button_text = @Translation("Search"),
- *    require_submit = TRUE,
+ *    require_submit = FALSE,
  *    pager = TRUE,
  *    num_items_per_page = 6,
  *  )

@@ -69,7 +69,7 @@ class FormBaseTest extends ChadoTestKernelBase {
       'permissions' => ["access content"],
       'url_path' => "search-fakers",
       'button_text' => "Search",
-      'require_submit' => TRUE,
+      'require_submit' => FALSE,
       'pager' => TRUE,
       'num_items_per_page' => 6,
     ],
@@ -80,7 +80,7 @@ class FormBaseTest extends ChadoTestKernelBase {
       'permissions' => ["access content"],
       'url_path' => "search-fakers",
       'button_text' => "Search",
-      'require_submit' => TRUE,
+      'require_submit' => FALSE,
       'pager' => TRUE,
       'num_items_per_page' => 3,
     ],
@@ -134,12 +134,11 @@ class FormBaseTest extends ChadoTestKernelBase {
     $query = new InputBag(
       $query_params,
     );
-    $post = new InputBag([]);
 
     // Current request.
     $current_request = $this->createMock(Request::class);
     $current_request->query = $query;
-    $current_request->request = $post;
+    $current_request->request = $query;
 
     // Request Stack.
     $request_stack = $this->createMock(RequestStack::class);
