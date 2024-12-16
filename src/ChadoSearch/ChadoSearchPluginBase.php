@@ -3,6 +3,7 @@
 namespace Drupal\chado_search\ChadoSearch;
 
 use Drupal\chado_search\ChadoSearch\Interfaces\ChadoSearchInterface;
+use Drupal\Core\Link;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\Form\FormState;
@@ -300,11 +301,12 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
       $params = $query_params;
       $params['offset'] = $prev_offset;
       $params['page_num'] = $prev_page_num;
-      $left_arrow = l(
+      $route_name = 'chado_search.form.' . $this->id();
+      $left_arrow = Link::createFromRoute(
         $left_arrow,
-        $this->urlPath(),
+        $route_name,
+        $params,
         [
-          'query' => $params,
           'html' => TRUE,
         ]
       );
@@ -322,11 +324,12 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
       $params = $query_params;
       $params['offset'] = $next_offset;
       $params['page_num'] = $next_page_num;
-      $right_arrow = l(
+      $route_name = 'chado_search.form.' . $this->id();
+      $right_arrow = Link::createFromRoute(
         $right_arrow,
-        $this->urlPath(),
+        $route_name,
+        $params,
         [
-          'query' => $params,
           'html' => TRUE,
         ]
       );
@@ -334,9 +337,9 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
 
     $form['pager'] = [
       '#type' => 'markup',
-      '#markup' => '<span class="pager-prev">' . $left_arrow . '</span>'
+      '#markup' => '<span class="pager-prev">' . $left_arrow->toString() . '</span>'
       . '<span class="pager-page">' . ' - Page ' . $page_num . ' - ' . '</span>'
-      . '<span class="pager-next">' . $right_arrow . '</span>',
+      . '<span class="pager-next">' . $right_arrow->toString() . '</span>',
       '#prefix' => '<div class="chadosearch-pager-container"><div class="pager">',
       '#suffix' => '</div></div>',
       '#weight' => 100,
