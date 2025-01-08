@@ -1,0 +1,30 @@
+<?php
+
+/**
+ * @file
+ * Contains all hook implementations for this module.
+ */
+
+/**
+ * Generates content for the Breeding Cross Search.
+ *
+ * @param int $num
+ *   The number of crosses you would like to generate. All crosses will have
+ *   both a mom and a dad and relationships connecting them to their parents.
+ * @param int|null $organism_id
+ *   The organism.organism_id of the species all the crosses and parents are
+ *   part of. If NULL, one will be created.
+ */
+function example_ccsearch_insert_breeding_crosses(int $num = 25, int|null $organism_id = NULL) {
+
+  $chado_connection = \Drupal::service('tripal_chado.database');
+
+  if ($organism_id === NULL) {
+    $organism_id = $chado_connection->insert('1:organism')
+      ->fields([
+        'genus' => 'Tripalus',
+        'species' => 'databasica',
+      ])
+      ->execute();
+  }
+}
