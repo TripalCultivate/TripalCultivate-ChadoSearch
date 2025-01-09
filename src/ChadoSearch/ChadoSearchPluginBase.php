@@ -380,9 +380,14 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
     $this->getQuery($query, $args, $offset);
 
     // Execute it.
-    if (!empty($query)) {
+    if (is_string($query) && !empty($query)) {
       return $this->chado_connection->query($query, $args)->fetchAll();
     }
+    else {
+      $result = $query->execute();
+      return $result->fetchAll();
+    }
+
     return FALSE;
   }
 
