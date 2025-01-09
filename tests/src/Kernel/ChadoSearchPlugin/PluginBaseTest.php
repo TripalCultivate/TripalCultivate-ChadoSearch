@@ -127,6 +127,11 @@ class PluginBaseTest extends ChadoTestKernelBase {
         'title' => 'Column2',
         'help' => 'The second filter.',
       ],
+      'column3' => [
+        'title' => 'Column3',
+        'help' => 'The third filter.',
+        'default' => 'FRED',
+      ],
     ];
 
     $configuration = [];
@@ -255,6 +260,136 @@ class PluginBaseTest extends ChadoTestKernelBase {
       $returned_value,
       "The filters returned did not match what we expected based on the info property set for ChadoSearchBasicallyBase.",
     );
+  }
+
+  /**
+   * Provides both submitted and expected values to the tests.
+   *
+   * @return array
+   *   An array of scenarios where each scenario has two keys:
+   *    - submitted: an array of values to submit.
+   *    - expected: an array of values we expect to get back.
+   */
+  public static function provideValues() {
+    $scenarios = [];
+
+    // Both columns defined.
+    $scenario = [
+      'submitted' => [
+        'column1' => 'NAME ' . uniqid(),
+        'column2' => 'Tripalus databasica',
+        'column3' => 'Sarah',
+      ],
+    ];
+    $scenario['expected'] = $scenario['submitted'];
+    $scenarios[] = $scenario;
+
+    // Column2 missing with no default.
+    $scenario = [
+      'submitted' => [
+        'column1' => 'NAME ' . uniqid(),
+        'column3' => 'Sarah',
+      ],
+    ];
+    $scenario['expected'] = $scenario['submitted'];
+    $scenario['expected']['column2'] = NULL;
+    $scenarios[] = $scenario;
+
+    // Column3 missing; default is FRED.
+    $scenario = [
+      'submitted' => [
+        'column1' => 'NAME ' . uniqid(),
+        'column2' => 'Tripalus databasica',
+      ],
+    ];
+    $scenario['expected'] = $scenario['submitted'];
+    $scenario['expected']['column3'] = 'FRED';
+    $scenarios[] = $scenario;
+
+    return $scenarios;
+  }
+
+  /**
+   * Tests the get + set methods managing values.
+   *
+   * @dataProvider provideValues
+   */
+  public function testBaseValueGetterSetters(array $submitted_values, array $expected_values) {
+
+    $expected_defaults = [
+      'column1' => NULL,
+      'column2' => NULL,
+      'column3' => 'FRED',
+    ];
+
+    // FIRST: Test the get/setValues (plural).
+    $configuration = [];
+    $plugin_id = 'basically_base';
+    $plugin_definition = [
+      'id' => "basically_base",
+      'title' => "Basically Base",
+      'description' => "A Fake plugin instance to test the base plugin class.",
+      'permissions' => ["access content"],
+      'url_path' => "search-fakers",
+      'button_text' => "Search",
+      'require_submit' => TRUE,
+      'pager' => TRUE,
+      'num_items_per_page' => 25,
+    ];
+    $instance = new ChadoSearchBasicallyBase($configuration, $plugin_id, $plugin_definition, $this->chado_connection);
+    $this->assertIsObject(
+      $instance,
+      "Unable to create ChadoSearchBasicallyBase plugin instance to test the base class."
+    );
+
+    // Try getting the values before we have set any.
+    $retrieved_values = $instance->getValues();
+    $this->assertEquals(
+      $expected_defaults,
+      $retrieved_values,
+      "There should only be defaults before we set values."
+    );
+
+    // Try setting values.
+    $instance->setValues($submitted_values);
+
+    // Now try getting them.
+    $retrieved_values = $instance->getValues();
+    $this->assertEqualsCanonicalizing(
+      $expected_values,
+      $retrieved_values,
+      "We were not able to retrieve the values we expected."
+    );
+
+    // SECOND: Test the getValue (singular).
+    $instance = new ChadoSearchBasicallyBase($configuration, $plugin_id, $plugin_definition, $this->chado_connection);
+    $this->assertIsObject(
+      $instance,
+      "Unable to create ChadoSearchBasicallyBase plugin instance to test the base class."
+    );
+
+    // Try getting the values before we have set any.
+    foreach ($expected_defaults as $key => $expected_default) {
+      $retrieved_value = $instance->getValue($key);
+      $this->assertEquals(
+        $expected_default,
+        $retrieved_value,
+        "There should only be defaults before we set values but this specific value was not the expected default."
+      );
+    }
+
+    // Try setting values.
+    $instance->setValues($submitted_values);
+
+    // Now try getting them one at a time.
+    foreach ($expected_values as $key => $expected_value) {
+      $retrieved_value = $instance->getValue($key);
+      $this->assertEquals(
+        $expected_value,
+        $retrieved_value,
+        "The retrieved value was not what we expected when retrieved on it's own."
+      );
+    }
   }
 
 }

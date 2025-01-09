@@ -61,6 +61,11 @@ class ChadoSearchBasicallyBase extends ChadoSearchPluginBase {
         'title' => 'Column2',
         'help' => 'The second filter.',
       ],
+      'column3' => [
+        'title' => 'Column3',
+        'help' => 'The third filter.',
+        'default' => 'FRED',
+      ],
     ],
   ];
 
