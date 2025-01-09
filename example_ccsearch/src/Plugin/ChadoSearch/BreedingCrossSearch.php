@@ -30,7 +30,7 @@ class BreedingCrossSearch extends ChadoSearchPluginBase {
   public static $info = [
     // Lists the columns in your results table.
     'fields' => [
-      'child_name' => [
+      'cross_name' => [
         'title' => 'Cross Name',
       ],
       'mom_name' => [
@@ -43,7 +43,7 @@ class BreedingCrossSearch extends ChadoSearchPluginBase {
     // The filter criteria available to the user.
     // This is used to generate a search form which can be altered.
     'filters' => [
-      'child_name' => [
+      'cross_name' => [
         'title' => 'Cross Number',
         'help' => 'The unique cross number within the breeding program.',
       ],
@@ -82,7 +82,7 @@ class BreedingCrossSearch extends ChadoSearchPluginBase {
     $filter_results = $this->values;
 
     $query = $this->chado_connection->select('1:stock', 'child');
-    $query->addField('child', 'name', 'child_name');
+    $query->addField('child', 'name', 'cross_name');
 
     // Add Mom to the query.
     $query->addJoin('LEFT', '1:stock_relationship', 'relmom', 'child.stock_id = relmom.object_id');
@@ -100,17 +100,17 @@ class BreedingCrossSearch extends ChadoSearchPluginBase {
     // NOTE: make your placeholders match the key in the $filter_results array.
     // - Cross Name.
     if (!empty($filter_results['cross_name'])) {
-      $query->condition('child.name', $filter_results['cross_name']);
+      $query->condition('child.name', $filter_results['cross_name'], '~');
     }
 
     // - Maternal Parent.
     if (!empty($filter_results['mom_name'])) {
-      $query->condition('mom.name', $filter_results['mom_name']);
+      $query->condition('mom.name', $filter_results['mom_name'], '~');
     }
 
     // - Paternal Parent.
     if (!empty($filter_results['dad_name'])) {
-      $query->condition('dad.name', $filter_results['dad_name']);
+      $query->condition('dad.name', $filter_results['dad_name'], '~');
     }
 
     $query->orderBy('child.name', 'ASC');
