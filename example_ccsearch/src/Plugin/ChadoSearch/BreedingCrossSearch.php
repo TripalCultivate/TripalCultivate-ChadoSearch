@@ -119,7 +119,9 @@ class BreedingCrossSearch extends ChadoSearchPluginBase {
     if ($offset and is_numeric($offset)) {
       $query->range($offset, 26);
     }
-    $query->range(0, 26);
+    else {
+      $query->range(0, 26);
+    }
   }
 
   /**
