@@ -11,6 +11,7 @@
  * @param int $num
  *   The number of crosses you would like to generate. All crosses will have
  *   both a mom and a dad and relationships connecting them to their parents.
+ *   Parents are not included in the number of crosses.
  * @param int|null $organism_id
  *   The organism.organism_id of the species all the crosses and parents are
  *   part of. If NULL, one will be created.
@@ -26,5 +27,127 @@ function example_ccsearch_insert_breeding_crosses(int $num = 25, int|null $organ
         'species' => 'databasica',
       ])
       ->execute();
+  }
+
+  // Create/update relationship terms using the ChadoBuddies.
+  $buddy_service = \Drupal::service('tripal_chado.chado_buddy');
+  $cvterm_instance = $buddy_service->createInstance('chado_cvterm_buddy', []);
+  $dbxref_instance = $buddy_service->createInstance('chado_dbxref_buddy', []);
+  // -- Make sure cv/db are present first.
+  $values = [
+    'cv.name' => 'Tripal Cultivate Ontology',
+    'cv.definition' => 'A collection of terms focused on supporting breeding-focused Tripal sites using the Tripal Cultivate package.',
+  ];
+  $cvterm_instance->upsertCv($values);
+  $values = [
+    'db.name' => 'TRPC',
+    'db.description' => 'A collection of terms focused on supporting breeding-focused Tripal sites using the Tripal Cultivate package.',
+    'db.url' => 'https://knowpulse.usask.ca/cv/lookup/TRPC',
+    'db.urlprefix' => 'https://knowpulse.usask.ca/cv/lookup/TRPC/{accession}',
+  ];
+  $dbxref_instance->upsertDb($values);
+  // -- Maternal relationship to child.
+  $values = [
+    'db.name' => 'TRPC',
+    'cv.name' => 'Tripal Cultivate Ontology',
+    'dbxref.accession' => '0022',
+    'cvterm.name' => 'maternal parent',
+    'cvterm.definition' => 'This term is used to indicate the relationship between a maternal parent (the subject; i.e. the plant producing seed in a sexual cross) and the seeds collected (the object; type F1 seeds).',
+  ];
+  $chado_cvterm_record = $cvterm_instance->upsertCvterm($values);
+  $maternal_parent_cvterm_id = $chado_cvterm_record->getValue('cvterm.cvterm_id');
+  // -- Paternal relationship to child.
+  $values = [
+    'db.name' => 'TRPC',
+    'cv.name' => 'Tripal Cultivate Ontology',
+    'dbxref.accession' => '0023',
+    'cvterm.name' => 'paternal parent',
+    'cvterm.definition' => 'This term is used to indicate the relationship between a paternal parent (the subject; i.e. the plant donating pollen in a sexual cross) and the seeds collected from the cross (the object; type F1 seeds)',
+  ];
+  $chado_cvterm_record = $cvterm_instance->upsertCvterm($values);
+  $paternal_parent_cvterm_id = $chado_cvterm_record->getValue('cvterm.cvterm_id');
+  // -- Cross: generated germplasm (CO_010:0000255).
+  $values = [
+    'db.name' => 'CO_010',
+    'dbxref.accession' => '0000255',
+    'cvterm.name' => 'generated germplasm',
+  ];
+  $cross_cvterm_id = $cvterm_instance->getCvterm($values)[0]->getValue('cvterm.cvterm_id');
+  // -- Parent: cultivar (CO_010:0000029).
+  $values = [
+    'db.name' => 'CO_010',
+    'dbxref.accession' => '0000029',
+    'cvterm.name' => 'cultivar',
+  ];
+  $parent_cvterm_id = $cvterm_instance->getCvterm($values)[0]->getValue('cvterm.cvterm_id');
+
+  // Now finally start creating the crosses and their parents.
+  for ($i = 0; $i < $num; $i++) {
+    // Insert cross.
+    $unique = uniqid();
+    $values = [
+      'organism_id' => $organism_id,
+      'type_id' => $cross_cvterm_id,
+      'name' => 'Fictus trigeminus ' . $unique,
+      'uniquename' => 'GERM:' . $unique,
+    ];
+    $cross_stock_id = $chado_connection->insert('1:stock')
+      ->fields($values)
+      ->execute();
+    if (is_numeric($cross_stock_id) && ($cross_stock_id > 0)) {
+      print "Created Breeding Cross '" . $values['name'] . "'.\n";
+    }
+
+    // Insert Mom.
+    $unique = uniqid();
+    $values = [
+      'organism_id' => $organism_id,
+      'type_id' => $parent_cvterm_id,
+      'name' => 'Fictus creatrix trigeminus ' . $unique,
+      'uniquename' => 'GERM:' . $unique,
+    ];
+    $parent_stock_id = $chado_connection->insert('1:stock')
+      ->fields($values)
+      ->execute();
+    if (is_numeric($parent_stock_id) && ($parent_stock_id > 0)) {
+      print "\tCreated Maternal Cultvar '" . $values['name'] . "'.\n";
+    }
+
+    // Relate Mom to Cross.
+    $values = [
+      'subject_id' => $parent_stock_id,
+      'type_id' => $maternal_parent_cvterm_id,
+      'object_id' => $cross_stock_id,
+    ];
+    $chado_connection->insert('1:stock_relationship')
+      ->fields($values)
+      ->execute();
+
+    // Insert Dad.
+    $unique = uniqid();
+    $values = [
+      'organism_id' => $organism_id,
+      'type_id' => $parent_cvterm_id,
+      'name' => 'Fictus pater trigeminus ' . $unique,
+      'uniquename' => 'GERM:' . $unique,
+    ];
+    $parent_stock_id = $chado_connection->insert('1:stock')
+      ->fields($values)
+      ->execute();
+    if (is_numeric($parent_stock_id) && ($parent_stock_id > 0)) {
+      print "\tCreated Paternal Cultvar '" . $values['name'] . "'.\n";
+    }
+
+    // Relate Dad to Cross.
+    $values = [
+      'subject_id' => $parent_stock_id,
+      'type_id' => $paternal_parent_cvterm_id,
+      'object_id' => $cross_stock_id,
+    ];
+    $chado_connection->insert('1:stock_relationship')
+      ->fields($values)
+      ->execute();
+
+    print "\n";
   }
 }
