@@ -2,6 +2,7 @@
 
 namespace Drupal\example_ccsearch\Plugin\ChadoSearch;
 
+use Drupal\chado_search\ChadoSearch\Interfaces\ChadoSearchInterface;
 use Drupal\chado_search\ChadoSearch\ChadoSearchPluginBase;
 use Drupal\Core\Database\Query\Select;
 
@@ -20,7 +21,7 @@ use Drupal\Core\Database\Query\Select;
  *    num_items_per_page = 25,
  *  )
  */
-class BreedingCrossSearch extends ChadoSearchPluginBase {
+class BreedingCrossSearch extends ChadoSearchPluginBase implements ChadoSearchInterface {
 
   /**
    * Information regarding the fields and filters for this search.
@@ -67,16 +68,14 @@ class BreedingCrossSearch extends ChadoSearchPluginBase {
    * ASSUMPTION: Parents are connected to a cross by is_maternal_parent and
    *   is_paternal_parent cvterms.
    *
-   * @param Drupal\Core\Database\Query\Select|string $query
-   *   The full SQL query to execute. This will be executed using chado_query()
-   *   so use curly brackets appropriately. Use :placeholders for any values.
-   * @param array $args
-   *   An array of arguments to pass to chado_query(). Keys must be the
-   *   placeholders in the query and values should be what you want them set to.
+   * @param Drupal\Core\Database\Query\Select|null $query
+   *   A Drupal select query object used to retrieve the results.
+   *   This parameter will be NULL when requested and initialized inside
+   *   this method.
    * @param int $offset
    *   The number of records to offset for the results. This is used in paging.
    */
-  public function getQuery(Select|string &$query, array &$args, int $offset = 0) {
+  public function getQuery(Select|null &$query, int $offset = 0) {
 
     // Retrieve the filter results already set.
     $filter_results = $this->values;

@@ -2,6 +2,8 @@
 
 namespace Drupal\Tests\chado_search\Fixtures;
 
+use Drupal\Core\Database\Query\Select;
+use Drupal\chado_search\ChadoSearch\Interfaces\ChadoSearchInterface;
 use Drupal\chado_search\ChadoSearch\ChadoSearchPluginBase;
 
 /**
@@ -19,7 +21,7 @@ use Drupal\chado_search\ChadoSearch\ChadoSearchPluginBase;
  *    num_items_per_page = 25,
  *  )
  */
-class ChadoSearchBasicallyBase extends ChadoSearchPluginBase {
+class ChadoSearchBasicallyBase extends ChadoSearchPluginBase implements ChadoSearchInterface {
 
   /**
    * Add CSS/JS to the form/results page through libraries.
@@ -70,18 +72,9 @@ class ChadoSearchBasicallyBase extends ChadoSearchPluginBase {
   ];
 
   /**
-   * The query method.
-   *
-   * @param string $query
-   *   The full SQL query to execute. This will be executed using chado_query()
-   *   so use curly brackets appropriately. Use :placeholders for any values.
-   * @param array $args
-   *   An array of arguments to pass to chado_query(). Keys must be the
-   *   placeholders in the query and values should be what you want them set to.
-   * @param int $offset
-   *   The number of records to offset for the results. This is used in paging.
+   * {@inheritdoc}
    */
-  public function getQuery(string &$query, array &$args, int $offset) {
+  public function getQuery(Select|null &$query, int $offset = 0) {
 
   }
 

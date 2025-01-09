@@ -133,21 +133,7 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
   }
 
   /**
-   * Generate the filter form.
-   *
-   * The base class will generate textfields for each filter defined in $info,
-   * set defaults, labels and descriptions, as well as, create the search
-   * button.
-   *
-   * Extend this method to alter the filter form.
-   *
-   * @param array $form
-   *   The base form definition for the form elements to be added to.
-   * @param \Drupal\Core\Form\FormState $form_state
-   *   The current state of the form.
-   *
-   * @return array
-   *   The fully defined form to be rendered for the search.
+   * {@inheritdoc}
    */
   public function form(array $form, FormState $form_state): array {
 
@@ -176,28 +162,13 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
   }
 
   /**
-   * Allows custom searches to validate the form results.
-   *
-   * Use $form_state::setError() to signal invalid values.
-   *
-   * @param array $form
-   *   The base form definition for the form elements to be added to.
-   * @param \Drupal\Core\Form\FormState $form_state
-   *   The current state of the form.
+   * {@inheritdoc}
    */
   public function validateForm(array $form, FormState $form_state): void {
   }
 
   /**
-   * Format the results within the $form array.
-   *
-   * The base class will format the results as a table.
-   *
-   * @param array $form
-   *   The current form array.
-   * @param array $results
-   *   The results to format. This will be an array of standard objects where
-   *   the keys map to the keys in $info['fields'].
+   * {@inheritdoc}
    */
   public function formatResults(array &$form, array $results): void {
 
@@ -259,15 +230,7 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
   }
 
   /**
-   * Adds a pager to the form.
-   *
-   * @param array $form
-   *   The form array to add the pager to.
-   * @param int $num_results
-   *   The number of results per page.
-   *
-   * @return array
-   *   The original form with the pager added.
+   * {@inheritdoc}
    */
   public function addPager(array $form, int $num_results): array {
 
@@ -363,14 +326,7 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
   }
 
   /**
-   * Uses the class defined query and values to retrieve the results.
-   *
-   * @param int $offset
-   *   The offset for the pager.
-   *
-   * @return array||false
-   *   Either an array of the results returned by the query, adjusted by the
-   *   offset OR False if an error is encountered.
+   * {@inheritdoc}
    */
   public function getResults($offset): array|FALSE {
 
@@ -392,32 +348,21 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
   }
 
   /**
-   * Sets the paging offset.
-   *
-   * @param int $offset
-   *   The offset to use in the query to support paging.
+   * {@inheritdoc}
    */
   public function setPagerOffset(int $offset): void {
     $this->pager_offset = $offset;
   }
 
   /**
-   * Sets the current page to support the pager.
-   *
-   * @param int $page_number
-   *   The current page of results to show.
+   * {@inheritdoc}
    */
   public function setCurrentPageNumber(int $page_number): void {
     $this->pager_current_page = $page_number;
   }
 
   /**
-   * Sets the values from the form based on user input.
-   *
-   * @param array $filter_values
-   *   An array of the user submitted values where the key matches an element
-   *   in the info['filter] array and the value is the value the user submitted
-   *   for that filter.
+   * {@inheritdoc}
    */
   public function setValues($filter_values): void {
 
@@ -437,31 +382,21 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
   }
 
   /**
-   * Returns the query offset used in paging.
-   *
-   * @return int
-   *   The query offset.
+   * {@inheritdoc}
    */
   public function getPagerOffset(): int {
     return $this->pager_offset;
   }
 
   /**
-   * Returns the current page number of results to show.
-   *
-   * @return int
-   *   The current page number.
+   * {@inheritdoc}
    */
   public function getCurrentPageNumber(): int {
     return $this->pager_current_page;
   }
 
   /**
-   * Returns all the filter values for this search.
-   *
-   * @return array
-   *   An array of filter values where the key is the machine name of the filter
-   *   and the value is it's value.
+   * {@inheritdoc}
    */
   public function getValues(): array {
     // If there are no values set yet then set the defaults at least.
@@ -472,13 +407,7 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
   }
 
   /**
-   * Get a specific value for this search's filter criteria.
-   *
-   * @param string $name
-   *   The name of the filter criteria you are interested in.
-   *
-   * @return mixed
-   *   The value for the specified filter criteria.
+   * {@inheritdoc}
    */
   public function getValue(string $name): mixed {
     // If there are no values set yet then set the defaults at least.
@@ -489,42 +418,21 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
   }
 
   /**
-   * Gets the fields defined for this search instance.
-   *
-   * These are used to define the table columns for the results and each item
-   * in the returned array maps to a result from the query.
-   *
-   * @return array
-   *   An array of fields defined for this instance where each item is keyed by
-   *   the chado column and the value is an array of details including a 'title'
-   *   and optional entity_link sub array.
+   * {@inheritdoc}
    */
   public function getDefinedFields(): array {
     return $this::$info['fields'];
   }
 
   /**
-   * Get the filters defined for this search instance.
-   *
-   * These are used in the where clause of the query to filter the results.
-   * Each machine name in the returned array should be used in the getQuery()
-   * method.
-   *
-   * @return array
-   *   An array of filters defined for this instance where each item is keyed by
-   *   its machine name and the value is an array of details including 'title'
-   *   and 'help'.
+   * {@inheritdoc}
    */
   public function getDefinedFilters(): array {
     return $this::$info['filters'];
   }
 
   /**
-   * Retrieves the CSS/JS libraries to attach to the form hosting this search.
-   *
-   * @return array
-   *   A simply list of libraries which must already be defined in the
-   *   libraries.yml.
+   * {@inheritdoc}
    */
   public function getLibraries(): array {
     return $this::$attached;

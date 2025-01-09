@@ -2,6 +2,8 @@
 
 namespace Drupal\Tests\chado_search\Fixtures;
 
+use Drupal\Core\Database\Query\Select;
+use Drupal\chado_search\ChadoSearch\Interfaces\ChadoSearchInterface;
 use Drupal\chado_search\ChadoSearch\ChadoSearchPluginBase;
 
 /**
@@ -19,7 +21,7 @@ use Drupal\chado_search\ChadoSearch\ChadoSearchPluginBase;
  *    num_items_per_page = 3,
  *  )
  */
-class ChadoSearchExactly2Pages extends ChadoSearchPluginBase {
+class ChadoSearchExactly2Pages extends ChadoSearchPluginBase implements ChadoSearchInterface {
 
   /**
    * Add CSS/JS to the form/results page through libraries.
@@ -67,7 +69,7 @@ class ChadoSearchExactly2Pages extends ChadoSearchPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function getQuery(string &$query, array &$args, int $offset) {
+  public function getQuery(Select|null &$query, int $offset = 0) {
 
   }
 
