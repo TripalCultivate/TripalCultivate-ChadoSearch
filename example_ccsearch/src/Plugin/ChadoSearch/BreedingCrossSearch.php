@@ -14,7 +14,7 @@ use Drupal\chado_search\ChadoSearch\ChadoSearchPluginBase;
  *    permissions = {"access content"},
  *    url_path = "search-crosses",
  *    button_text = @Translation("Search"),
- *    require_submit = TRUE,
+ *    require_submit = FALSE,
  *    pager = TRUE,
  *    num_items_per_page = 25,
  *  )
@@ -42,6 +42,14 @@ class BreedingCrossSearch extends ChadoSearchPluginBase {
     // The filter criteria available to the user.
     // This is used to generate a search form which can be altered.
     'filters' => [
+      'genus' => [
+        'title' => 'Genus',
+        'help' => 'The genus the germplasm belongs to (e.g. Lens).',
+      ],
+      'species' => [
+        'title' => 'Species',
+        'help' => 'The species the germplasm belongs to (e.g. culinaris).',
+      ],
       'child_name' => [
         'title' => 'Cross Number',
         'help' => 'The unique cross number within the breeding program.',
