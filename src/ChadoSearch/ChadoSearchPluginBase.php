@@ -3,7 +3,7 @@
 namespace Drupal\chado_search\ChadoSearch;
 
 use Drupal\chado_search\ChadoSearch\Interfaces\ChadoSearchInterface;
-use Drupal\Core\Link;
+use Drupal\Core\Url;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\Form\FormState;
@@ -302,15 +302,20 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
       $params['offset'] = $prev_offset;
       $params['page_num'] = $prev_page_num;
       $route_name = 'chado_search.form.' . $this->id();
-      $left_arrow = Link::createFromRoute(
-        $left_arrow,
-        $route_name,
-        $params,
-        [
-          'html' => TRUE,
-        ]
-      );
+      $left_arrow = [
+        '#type' => 'link',
+        '#title' => ['#markup' => $left_arrow],
+        '#url' => url::fromRoute($route_name, $params),
+      ];
     }
+    else {
+      $left_arrow = [
+        '#type' => 'markup',
+        '#markup' => $left_arrow,
+      ];
+    }
+    $left_arrow['#prefix'] = '<span class="pager-prev">';
+    $left_arrow['#suffix'] = '</span>';
     // -- Right: if we are not at the end then link to the next page.
     if ($num_results > $this->numItemsPerPage()) {
       // Determine the next page info.
@@ -325,25 +330,34 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
       $params['offset'] = $next_offset;
       $params['page_num'] = $next_page_num;
       $route_name = 'chado_search.form.' . $this->id();
-      $right_arrow = Link::createFromRoute(
-        $right_arrow,
-        $route_name,
-        $params,
-        [
-          'html' => TRUE,
-        ]
-      );
+      $right_arrow = [
+        '#type' => 'link',
+        '#title' => ['#markup' => $right_arrow],
+        '#url' => Url::fromRoute($route_name, $params),
+      ];
     }
+    else {
+      $right_arrow = [
+        '#type' => 'markup',
+        '#markup' => $right_arrow,
+      ];
+    }
+    $right_arrow['#prefix'] = '<span class="pager-next">';
+    $right_arrow['#suffix'] = '</span>';
 
     $form['pager'] = [
-      '#type' => 'markup',
-      '#markup' => '<span class="pager-prev">' . $left_arrow->toString() . '</span>'
-      . '<span class="pager-page">' . ' - Page ' . $page_num . ' - ' . '</span>'
-      . '<span class="pager-next">' . $right_arrow->toString() . '</span>',
       '#prefix' => '<div class="chadosearch-pager-container"><div class="pager">',
       '#suffix' => '</div></div>',
       '#weight' => 100,
     ];
+    $form['pager']['left_nav'] = $left_arrow;
+    $form['pager']['page'] = [
+      '#type' => 'markup',
+      '#prefix' => '<span class="pager-page">',
+      '#markup' => ' - Page ' . $page_num . ' - ',
+      '#suffix' => '</span>',
+    ];
+    $form['pager']['right_nav'] = $right_arrow;
 
     return $form;
   }
