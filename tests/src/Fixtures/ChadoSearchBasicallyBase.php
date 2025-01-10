@@ -76,6 +76,15 @@ class ChadoSearchBasicallyBase extends ChadoSearchPluginBase implements ChadoSea
    */
   public function getQuery(Select|null &$query, int $offset = 0) {
 
+    if ($offset === 5) {
+      return NULL;
+    }
+
+    if ($offset === 10) {
+      $query = $this->chado_connection->select('1:organism', 'o')
+        ->fields('o', ['genus', 'species']);
+      return $query;
+    }
   }
 
 }

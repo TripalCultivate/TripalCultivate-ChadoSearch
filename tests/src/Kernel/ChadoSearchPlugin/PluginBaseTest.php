@@ -537,4 +537,44 @@ class PluginBaseTest extends ChadoTestKernelBase {
 
   }
 
+  /**
+   * Test get results.
+   */
+  public function testGetResults() {
+
+    $configuration = [];
+    $plugin_id = 'basically_base';
+    $plugin_definition = [
+      'id' => "basically_base",
+      'title' => "Basically Base",
+      'description' => "A Fake plugin instance to test the base plugin class.",
+      'permissions' => ["access content"],
+      'url_path' => "search-fakers",
+      'button_text' => "Search",
+      'require_submit' => TRUE,
+      'pager' => TRUE,
+      'num_items_per_page' => 25,
+    ];
+    $instance = new ChadoSearchBasicallyBase($configuration, $plugin_id, $plugin_definition, $this->chado_connection);
+    $this->assertIsObject(
+      $instance,
+      "Unable to create ChadoSearchBasicallyBase plugin instance to test the base class."
+    );
+
+    // Instance->getQuery() will return NULL if offset:5 is passed in.
+    $results = $instance->getResults(5);
+    $this->assertFalse($results, "We expect to have false returned when getQuery() returns NULL");
+
+    // Instance->getQuery() will return all organism if offset:10 is passed in.
+    $this->chado_connection->insert('1:organism')
+      ->fields([
+        'genus' => 'Tripalus',
+        'species' => 'databasica',
+      ])
+      ->execute();
+    $results = $instance->getResults(10);
+    $this->assertIsArray($results, "We expect to have results returned when getQuery() returns a query.");
+    $this->assertCount(1, $results, "There should be one result since we inserted one organism.");
+  }
+
 }
