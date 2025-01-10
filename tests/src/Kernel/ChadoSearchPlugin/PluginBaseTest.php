@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\chado_search\Kernel\Validators;
 
+use Drupal\Core\Form\FormState;
 use Drupal\Tests\tripal_chado\Kernel\ChadoTestKernelBase;
 use Drupal\Tests\chado_search\Fixtures\ChadoSearchBasicallyBase;
 use Drupal\tripal_chado\Database\ChadoConnection;
@@ -390,6 +391,76 @@ class PluginBaseTest extends ChadoTestKernelBase {
         "The retrieved value was not what we expected when retrieved on it's own."
       );
     }
+  }
+
+  /**
+   * Tests the plugin default functions around the form.
+   */
+  public function testFormFunctions() {
+
+    $configuration = [];
+    $plugin_id = 'basically_base';
+    $plugin_definition = [
+      'id' => "basically_base",
+      'title' => "Basically Base",
+      'description' => "A Fake plugin instance to test the base plugin class.",
+      'permissions' => ["access content"],
+      'url_path' => "search-fakers",
+      'button_text' => "Search",
+      'require_submit' => TRUE,
+      'pager' => TRUE,
+      'num_items_per_page' => 25,
+    ];
+    $instance = new ChadoSearchBasicallyBase($configuration, $plugin_id, $plugin_definition, $this->chado_connection);
+    $this->assertIsObject(
+      $instance,
+      "Unable to create ChadoSearchBasicallyBase plugin instance to test the base class."
+    );
+
+    // Check the form array.
+    $form_state = new FormState();
+    $form = [];
+    $form = $instance->form($form, $form_state);
+    $this->assertIsArray($form, "We should have been given a form array.");
+    $this->assertStringContainsString(
+      $plugin_definition['description'],
+      $form['header']['#markup'],
+    );
+    foreach (['column1', 'column2', 'column3'] as $key) {
+      $this->assertArrayHasKey($key, $form, "We expect the form to have an element for each filter defined by the plugin.");
+      $this->assertArrayHasKey('#type', $form[$key], "Each form element for a filter should be a render array.");
+      $this->assertEquals('textfield', $form[$key]['#type'], "Eacg form element for a filter should be a textfield by default.");
+    }
+    $this->assertArrayHasKey('submit', $form, "There should be a submit button.");
+
+    // Currently the base validate doesn't do anything so we can just call it.
+    $instance->validateForm($form, $form_state);
+
+  }
+
+  /**
+   * Tests the plugin default functions around the pager and its management.
+   */
+  public function testPagerFunctions() {
+
+    $configuration = [];
+    $plugin_id = 'basically_base';
+    $plugin_definition = [
+      'id' => "basically_base",
+      'title' => "Basically Base",
+      'description' => "A Fake plugin instance to test the base plugin class.",
+      'permissions' => ["access content"],
+      'url_path' => "search-fakers",
+      'button_text' => "Search",
+      'require_submit' => TRUE,
+      'pager' => TRUE,
+      'num_items_per_page' => 25,
+    ];
+    $instance = new ChadoSearchBasicallyBase($configuration, $plugin_id, $plugin_definition, $this->chado_connection);
+    $this->assertIsObject(
+      $instance,
+      "Unable to create ChadoSearchBasicallyBase plugin instance to test the base class."
+    );
   }
 
 }
