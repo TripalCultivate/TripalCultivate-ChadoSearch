@@ -577,4 +577,46 @@ class PluginBaseTest extends ChadoTestKernelBase {
     $this->assertCount(1, $results, "There should be one result since we inserted one organism.");
   }
 
+  /**
+   * Test formatting results.
+   */
+  public function testFormatResults() {
+
+    $configuration = [];
+    $plugin_id = 'basically_base';
+    $plugin_definition = [
+      'id' => "basically_base",
+      'title' => "Basically Base",
+      'description' => "A Fake plugin instance to test the base plugin class.",
+      'permissions' => ["access content"],
+      'url_path' => "search-fakers",
+      'button_text' => "Search",
+      'require_submit' => TRUE,
+      'pager' => TRUE,
+      'num_items_per_page' => 25,
+    ];
+    $instance = new ChadoSearchBasicallyBase($configuration, $plugin_id, $plugin_definition, $this->chado_connection);
+    $this->assertIsObject(
+      $instance,
+      "Unable to create ChadoSearchBasicallyBase plugin instance to test the base class."
+    );
+
+    $form = [];
+    $results = [];
+    $results[1] = [
+      'column1' => 'val1A',
+    ];
+    $results[1] = (object) $results[1];
+    $results[2] = [
+      'column2' => 'val2B',
+    ];
+    $results[2] = (object) $results[2];
+    $instance->formatResults($form, $results);
+    $this->assertArrayHasKey('results', $form, "There should be results added to the form");
+    $this->arrayHasKey('#type', $form['results'], "The results should be a render array.");
+    $this->assertEquals('table', $form['results']['#type'], "The results should be a table.");
+    $this->assertArrayHasKey('#rows', $form['results'], "There should be rows in the table.");
+    $this->assertCount(2, $form['results']['#rows'], "There should be two rows.");
+  }
+
 }
