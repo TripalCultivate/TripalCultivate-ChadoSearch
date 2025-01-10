@@ -309,6 +309,7 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
     $right_arrow['#suffix'] = '</span>';
 
     $form['pager'] = [
+      '#type' => 'container',
       '#prefix' => '<div class="chadosearch-pager-container"><div class="pager">',
       '#suffix' => '</div></div>',
       '#weight' => 100,
