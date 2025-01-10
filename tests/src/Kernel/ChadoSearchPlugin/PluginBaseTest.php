@@ -436,12 +436,70 @@ class PluginBaseTest extends ChadoTestKernelBase {
     // Currently the base validate doesn't do anything so we can just call it.
     $instance->validateForm($form, $form_state);
 
+    // Pager Offset.
+    $instance->setPagerOffset(25);
+    $retrieved_offset = $instance->getPagerOffset();
+    $this->assertEquals(25, $retrieved_offset, "Pager Offset: we expect to get the same value we set.");
+
+    // Current Pager number (used by pager).
+    $instance->setCurrentPageNumber(2);
+    $retrieved_page_num = $instance->getCurrentPageNumber();
+    $this->assertEquals(2, $retrieved_page_num, "Current Page Number: we expect to get the same value we set.");
+  }
+
+  /**
+   * Provides values when testing the pager.
+   *
+   * @return array
+   *   An array of scenarios.
+   */
+  public static function providePagerValues() {
+    $scenarios = [];
+
+    $scenarios[] = [
+      'settings' => [
+        'page_num' => 1,
+        'offset' => 0,
+        'num_results' => 5,
+      ],
+    ];
+
+    $scenarios[] = [
+      'settings' => [
+        'page_num' => 2,
+        'offset' => 25,
+        'num_results' => 30,
+      ],
+    ];
+
+    $scenarios[] = [
+      'settings' => [
+        'page_num' => 2,
+        'offset' => 25,
+        'num_results' => 5,
+      ],
+    ];
+
+    $scenarios[] = [
+      'settings' => [
+        'page_num' => 1,
+        'offset' => 5,
+        'num_results' => 5,
+      ],
+    ];
+
+    return $scenarios;
   }
 
   /**
    * Tests the plugin default functions around the pager and its management.
+   *
+   * @dataProvider providePagerValues
+   *
+   * @todo check that the left and right nav are a string or link depending
+   * on the page number and number of results.
    */
-  public function testPagerFunctions() {
+  public function testAddPager(array $settings) {
 
     $configuration = [];
     $plugin_id = 'basically_base';
@@ -461,6 +519,22 @@ class PluginBaseTest extends ChadoTestKernelBase {
       $instance,
       "Unable to create ChadoSearchBasicallyBase plugin instance to test the base class."
     );
+
+    $instance->setCurrentPageNumber($settings['page_num']);
+    $instance->setPagerOffset($settings['offset']);
+    $form = [];
+    $form = $instance->addPager($form, $settings['num_results']);
+    $pager = $form['pager'];
+    $this->assertIsArray($pager, "We expect addPager to return an array.");
+    $this->assertArrayHasKey('#type', $pager, "We expect addPager to return an RENDER array.");
+
+    // We expect the following base keys.
+    foreach (['left_nav', 'page', 'right_nav'] as $key) {
+      $this->assertArrayHasKey($key, $pager, "NOT PRESENT: We expect this base sub-render array in the pager.");
+      $this->assertIsArray($pager[$key], "NOT ARRAY: We expect this base sub-render array in the pager.");
+      $this->assertArrayHasKey('#type', $pager[$key], "NOT RENDER ARRAY: We expect this base sub-render array in the pager.");
+    }
+
   }
 
 }
