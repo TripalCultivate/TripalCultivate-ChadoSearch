@@ -1,12 +1,12 @@
 <?php
 
-namespace Drupal\chado_search\ChadoSearch\Interfaces;
+namespace Drupal\trpcultivate_chadosearch\ChadoSearch\Interfaces;
 
 use Drupal\Core\Database\Query\Select;
 use Drupal\Core\Form\FormState;
 
 /**
- * Interface for chado_search plugins.
+ * Interface for trpcultivate_chadosearch plugins.
  */
 interface ChadoSearchInterface {
 

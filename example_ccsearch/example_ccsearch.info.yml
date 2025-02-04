@@ -6,4 +6,4 @@ core_version_requirement: ^10 | ^11
 dependencies:
   - "tripal:tripal"
   - "tripal:tripal_chado"
-  - "chado_search:chado_search"
+  - "trpcultivate_chadosearch:trpcultivate_chadosearch"

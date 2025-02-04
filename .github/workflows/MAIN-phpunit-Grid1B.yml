@@ -32,8 +32,8 @@ jobs:
       - name: Run Automated testing
         uses: tripal/test-tripal-action@v1.6
         with:
-          directory-name: 'chado_search'
-          modules: 'chado_search'
+          directory-name: 'TripalCultivate-ChadoSearch'
+          modules: 'trpcultivate_chadosearch example_ccsearch'
           build-image: TRUE
           dockerfile: 'Dockerfile'
           php-version: '8.2'

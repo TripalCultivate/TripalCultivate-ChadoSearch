@@ -1,8 +1,8 @@
 <?php
 
-namespace Drupal\chado_search\ChadoSearch;
+namespace Drupal\trpcultivate_chadosearch\ChadoSearch;
 
-use Drupal\chado_search\ChadoSearch\Interfaces\ChadoSearchInterface;
+use Drupal\trpcultivate_chadosearch\ChadoSearch\Interfaces\ChadoSearchInterface;
 use Drupal\Core\Url;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Component\Plugin\PluginBase;
@@ -11,7 +11,7 @@ use Drupal\tripal_chado\Database\ChadoConnection;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Base class for chado_search plugins.
+ * Base class for trpcultivate_chadosearch plugins.
  */
 abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchInterface, ContainerFactoryPluginInterface {
 
@@ -264,7 +264,7 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
       $params = $query_params;
       $params['offset'] = $prev_offset;
       $params['page_num'] = $prev_page_num;
-      $route_name = 'chado_search.form.' . $this->id();
+      $route_name = 'trpcultivate_chadosearch.form.' . $this->id();
       $left_arrow = [
         '#type' => 'link',
         '#title' => ['#markup' => $left_arrow],
@@ -292,7 +292,7 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
       $params = $query_params;
       $params['offset'] = $next_offset;
       $params['page_num'] = $next_page_num;
-      $route_name = 'chado_search.form.' . $this->id();
+      $route_name = 'trpcultivate_chadosearch.form.' . $this->id();
       $right_arrow = [
         '#type' => 'link',
         '#title' => ['#markup' => $right_arrow],

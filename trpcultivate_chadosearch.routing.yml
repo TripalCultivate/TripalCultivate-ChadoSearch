@@ -1,4 +1,4 @@
 
 ## Provide dynamic routes for the chado search plugin instances.
 route_callbacks:
-  - 'chado_search.manager:routes'
+  - 'trpcultivate_chadosearch.manager:routes'

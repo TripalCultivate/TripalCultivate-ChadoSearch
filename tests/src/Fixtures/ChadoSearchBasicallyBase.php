@@ -1,10 +1,10 @@
 <?php
 
-namespace Drupal\Tests\chado_search\Fixtures;
+namespace Drupal\Tests\trpcultivate_chadosearch\Fixtures;
 
 use Drupal\Core\Database\Query\Select;
-use Drupal\chado_search\ChadoSearch\Interfaces\ChadoSearchInterface;
-use Drupal\chado_search\ChadoSearch\ChadoSearchPluginBase;
+use Drupal\trpcultivate_chadosearch\ChadoSearch\Interfaces\ChadoSearchInterface;
+use Drupal\trpcultivate_chadosearch\ChadoSearch\ChadoSearchPluginBase;
 
 /**
  * Creates a fake plugin class to test that is essentially the base class.

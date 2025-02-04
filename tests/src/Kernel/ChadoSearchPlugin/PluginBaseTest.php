@@ -1,17 +1,17 @@
 <?php
 
-namespace Drupal\Tests\chado_search\Kernel\Validators;
+namespace Drupal\Tests\trpcultivate_chadosearch\Kernel\Validators;
 
 use Drupal\Core\Form\FormState;
 use Drupal\Tests\tripal_chado\Kernel\ChadoTestKernelBase;
-use Drupal\Tests\chado_search\Fixtures\ChadoSearchBasicallyBase;
+use Drupal\Tests\trpcultivate_chadosearch\Fixtures\ChadoSearchBasicallyBase;
 use Drupal\tripal_chado\Database\ChadoConnection;
 
 /**
  * Tests ChadoSearch Plugin Base functions.
  *
- * @group chado_search
- * @group chado_search_plugin
+ * @group trpcultivate_chadosearch
+ * @group trpcultivate_chadosearch_plugin
  */
 class PluginBaseTest extends ChadoTestKernelBase {
 
@@ -29,7 +29,7 @@ class PluginBaseTest extends ChadoTestKernelBase {
    */
   protected static $modules = [
     'tripal_chado',
-    'chado_search',
+    'trpcultivate_chadosearch',
   ];
 
   /**

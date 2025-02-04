@@ -1,7 +1,7 @@
 name: "Chado Search API"
 type: module
 description: Provides a API for creating custom search forms without the use of Drupal Views.
-package: "Tripal Extensions"
+package: "Tripal Cultivate: Chado Search"
 core_version_requirement: ^10 | ^11
 dependencies:
   - "tripal:tripal"

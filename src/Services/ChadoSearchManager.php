@@ -1,12 +1,12 @@
 <?php
 
-namespace Drupal\chado_search\Services;
+namespace Drupal\trpcultivate_chadosearch\Services;
 
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
-use Drupal\chado_search\ChadoSearch\Annotation\ChadoSearch;
-use Drupal\chado_search\ChadoSearch\Interfaces\ChadoSearchInterface;
+use Drupal\trpcultivate_chadosearch\ChadoSearch\Annotation\ChadoSearch;
+use Drupal\trpcultivate_chadosearch\ChadoSearch\Interfaces\ChadoSearchInterface;
 use Symfony\Component\Routing\Route;
 
 /**
@@ -37,8 +37,8 @@ class ChadoSearchManager extends DefaultPluginManager {
       ChadoSearchInterface::class,
       ChadoSearch::class,
     );
-    $this->alterInfo('chado_search_info');
-    $this->setCacheBackend($cache_backend, 'chado_search_plugins');
+    $this->alterInfo('trpcultivate_chadosearch_info');
+    $this->setCacheBackend($cache_backend, 'trpcultivate_chadosearch_plugins');
   }
 
   /**
@@ -55,11 +55,11 @@ class ChadoSearchManager extends DefaultPluginManager {
 
     // For each instance... create a route object and add it to the list.
     foreach ($search_instances as $search_definition) {
-      $route_name = 'chado_search.form.' . $search_definition['id'];
+      $route_name = 'trpcultivate_chadosearch.form.' . $search_definition['id'];
       $routes[$route_name] = new Route(
         $search_definition['url_path'],
         [
-          '_form' => '\Drupal\chado_search\Form\ChadoSearchForm',
+          '_form' => '\Drupal\trpcultivate_chadosearch\Form\ChadoSearchForm',
           'instance_id' => $search_definition['id'],
           '_title' => (string) $search_definition['title'],
         ],
