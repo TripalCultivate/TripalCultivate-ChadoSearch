@@ -1,0 +1,7 @@
+name: "Research Management Searches"
+type: module
+description: Provides a collection of searches focused on research management including ones for grants and studies.
+core_version_requirement: ^10 | ^11
+dependencies:
+  - "tripal:tripal"
+  - "tripal:tripal_chado"
