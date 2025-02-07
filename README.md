@@ -2,9 +2,8 @@
 ![Module is Generic](https://img.shields.io/badge/generic-confirmed-brightgreen)
 ![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/TripalCultivate/TripalCultivate-ChadoSearch?include_prereleases)
 
-[![Build Status](https://travis-ci.org/TripalCultivate/TripalCultivate-ChadoSearch.svg?branch=master)](https://travis-ci.org/TripalCultivate/TripalCultivate-ChadoSearch)
-[![Maintainability](https://api.codeclimate.com/v1/badges/69080fdb30c5c3a46350/maintainability)](https://codeclimate.com/github/TripalCultivate/TripalCultivate-ChadoSearch/maintainability)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/69080fdb30c5c3a46350/test_coverage)](https://codeclimate.com/github/TripalCultivate/TripalCultivate-ChadoSearch/test_coverage)
+[![Maintainability](https://api.codeclimate.com/v1/badges/4e809649e4f889502aca/maintainability)](https://codeclimate.com/github/TripalCultivate/TripalCultivate-ChadoSearch/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/4e809649e4f889502aca/test_coverage)](https://codeclimate.com/github/TripalCultivate/TripalCultivate-ChadoSearch/test_coverage)
 
 # Chado Custom Search
 
