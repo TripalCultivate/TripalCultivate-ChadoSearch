@@ -28,7 +28,7 @@ class BreedingCrossSearch extends ChadoSearchPluginBase implements ChadoSearchIn
    *
    * @var array
    */
-  public static $info = [
+  public static array $info = [
     // Lists the columns in your results table.
     'fields' => [
       'cross_name' => [

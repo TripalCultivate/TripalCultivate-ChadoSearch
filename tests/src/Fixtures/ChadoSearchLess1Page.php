@@ -42,7 +42,7 @@ class ChadoSearchLess1Page extends ChadoSearchPluginBase implements ChadoSearchI
    *
    * @var array
    */
-  public static $info = [
+  public static array $info = [
     // Lists the columns in your results table.
     'fields' => [
       'column1' => [

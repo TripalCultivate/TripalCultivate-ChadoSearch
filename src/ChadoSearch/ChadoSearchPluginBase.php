@@ -30,7 +30,7 @@ abstract class ChadoSearchPluginBase extends PluginBase implements ChadoSearchIn
    *
    * @var array
    */
-  public static $info = [
+  public static array $info = [
     // Lists the columns in your results table.
     'fields' => [
       'column_name' => [
