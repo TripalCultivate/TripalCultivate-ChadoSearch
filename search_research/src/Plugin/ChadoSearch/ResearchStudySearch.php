@@ -4,6 +4,7 @@ namespace Drupal\search_research\Plugin\ChadoSearch;
 
 use Drupal\trpcultivate_chadosearch\ChadoSearch\Interfaces\ChadoSearchInterface;
 use Drupal\trpcultivate_chadosearch\ChadoSearch\ChadoSearchPluginBase;
+use Drupal\Core\Database\Query\Select;
 
 /**
  * Creates a search for research studies and their associated experiments.
@@ -53,11 +54,6 @@ class ResearchStudySearch extends ChadoSearchPluginBase implements ChadoSearchIn
       'genus' => [
         'title' => 'Genus',
         'help' => 'The legume species the research study is focused on (e.g. Lens culinaris).',
-        'default' => 'Lens',
-      ],
-      'species' => [
-        'title' => 'Species',
-        'help' => '',
       ],
       'name' => [
         'title' => 'Name',
@@ -81,89 +77,109 @@ class ResearchStudySearch extends ChadoSearchPluginBase implements ChadoSearchIn
     // Retrieve the filter results already set.
     $filter_results = $this->values;
 
-    // @todo Collaborators: 5311
-    $query = "
-      SELECT
-        exp.name, exp.project_id,
-        exp.description,
-        genus.value as genus,
-        yr.value as year,
-        cat.value as category
-      FROM {project} exp
-      LEFT JOIN {projectprop} genus ON genus.project_id=exp.project_id
-        AND genus.type_id=4032 AND genus.rank=0
-      LEFT JOIN {projectprop} yr ON yr.project_id=exp.project_id
-        AND yr.type_id=6364 AND yr.rank=0
-      LEFT JOIN {projectprop} cat ON cat.project_id=exp.project_id
-        AND cat.type_id=6365 AND cat.rank=0
-      LEFT JOIN {projectprop} re ON re.project_id=exp.project_id
-        AND re.type_id=4310 AND re.rank=0";
+    $query = $this->chado_connection->select('1:project', 'study');
+    $query->fields('study', ['project_id', 'name', 'description']);
+    $query->condition('study.type_id', $this->getType('SIO', '001066'), 'IN');
 
-    $where = [];
-    $joins = [];
+    // Add Genus to the query.
+    $query->addJoin(
+      'LEFT',
+      '1:projectprop',
+      'genus',
+      'genus.project_id=study.project_id',
+    );
+    $query->condition('genus.type_id', $this->getType('TAXRANK', '0000005'), 'IN');
+    $query->addField('genus', 'value', 'genus');
 
-    $where[] = "re.value = :content_type";
-    $args[':content_type'] = 'SIO:Study';
+    // Add Year to the query.
+    $query->addJoin(
+      'LEFT',
+      '1:projectprop',
+      'year',
+      'year.project_id=study.project_id',
+    );
+    $query->condition('year.type_id', $this->getType('NCIT', 'C29848'), 'IN');
+    $query->addField('year', 'value', 'year');
+
     // -- Genus.
     if ($filter_results['genus'] != '') {
-      $where[] = "genus.value ~* :genus";
-      $args[':genus'] = $filter_results['genus'];
-    }
-
-    // -- Species.
-    if ($filter_results['species'] != '') {
-      $where[] = "species.value ~* :species";
-      $args[':species'] = $filter_results['species'];
+      $query->condition('genus.value', $filter_results['genus'], '~*');
     }
 
     // -- Name.
     if ($filter_results['name'] != '') {
-      $where[] = "exp.name ~* :name";
-      $args[':name'] = $filter_results['name'];
-    }
-
-    // Finally, add it to the query.
-    if (!empty($joins)) {
-      $query .= implode("\n", $joins);
-    }
-    if (!empty($where)) {
-      $query .= "\n" . ' WHERE ' . implode(' AND ', $where);
+      $query->condition('study.name', $filter_results['name'], '~*');
     }
 
     // Sort even though it is SLOW b/c ppl expect it.
-    $query .= "\n" . ' ORDER BY substring(yr.value, 6, 9) DESC, exp.name ASC';
+    $query->addExpression('substring(year.value, 6, 9)', 'shortened_year');
+    $query->orderBy('shortened_year', 'DESC');
+    $query->orderBy('study.name', 'ASC');
 
-    // Handle paging.
-    $limit = $this::$num_items_per_page + 1;
-    $query .= "\n" . ' LIMIT ' . $limit . ' OFFSET ' . $offset;
+    // Add the offset to the query for paging.
+    if ($offset and is_numeric($offset)) {
+      $query->range($offset, 26);
+    }
+    else {
+      $query->range(0, 26);
+    }
 
-    // @debug dpm(strtr(str_replace(['{','}'], ['chado.', ''], $query), $args), 'query');
+  }
+
+  /**
+   * Retrieve the cvterm ID for the given accession.
+   *
+   * @param string $idSpace
+   *   The ID Space of the term you want to retrieve the cvterm_id for.
+   * @param string $accession
+   *   The accession of the term you want to retrieve the cvterm_id for.
+   *
+   * @return int
+   *   The cvterm_id of the term we want to retrieve.
+   */
+  public function getType(string $idSpace, string $accession): int {
+    $query = $this->chado_connection->select('1:cvterm', 'cvt')
+      ->fields('cvt', ['cvterm_id']);
+
+    $query->addJoin(
+      'LEFT',
+      '1:dbxref',
+      'dbx',
+      'dbx.dbxref_id=cvt.dbxref_id',
+    );
+    $query->condition('dbx.accession', $accession);
+
+    $query->addJoin(
+      'LEFT',
+      '1:db',
+      'db',
+      'db.db_id=dbx.db_id',
+    );
+    $query->condition('db.name', $idSpace);
+
+    $result = $query->execute();
+    return $result->fetchField();
   }
 
   /**
    * {@inheritdoc}
+   *
+   * @todo Add content type linking for the study titles.
+   * @todo Add a read more link at the end of a shortened description.
+   * @todo Add styling to the results.
+   * @todo Update the elements to use nested render arrays rather then
+   *   concatenating HTML strings together.
    */
   public function formatResults(array &$form, array $results): void {
     $list = [];
 
     foreach ($results as $r) {
-      // Add a link to the title.
       $title = $r->name;
-      $id = NULL;
-      if ($r->project_id) {
-        $id = chado_get_record_entity_by_table('project', $r->project_id);
-        if ($id) {
-          $title = l($r->name, 'bio_data/' . $id);
-        }
-      }
 
       // Substring the description.
       $description = strip_tags($r->description);
       if (preg_match('/^.{1,300}\b/s', $description, $match)) {
         $description = trim($match[0]);
-      }
-      if ($id && (strlen($description) > 0)) {
-        $description .= ' ' . l('[Read more]', 'bio_data/' . $id);
       }
 
       $markup = '
@@ -173,19 +189,22 @@ class ResearchStudySearch extends ChadoSearchPluginBase implements ChadoSearchIn
             <div class="result-description">' . $description . '</div>
           </div>
 	  <div class="result-right">';
-      if ($r->year) {
+      if (isset($r->year)) {
         $markup .= '<div class="result-year" title="Year(s) of Funding">' . $r->year . '</div>';
       }
-      if ($r->genus) {
+      if (isset($r->genus)) {
         $markup .= '<div class="result-genus" title="Genus for germplasm">' . $r->genus . '</div>';
       }
-      if ($r->category) {
+      if (isset($r->category)) {
         $markup .= '<div class="result-category" title="Research Category">' . $r->category . '</div>';
       }
       $markup .= '
           </div>
         </div>';
-      $list[] = $markup;
+      $list[] = [
+        '#type' => 'markup',
+        '#markup' => $markup,
+      ];
     }
 
     $form['results'] = [
