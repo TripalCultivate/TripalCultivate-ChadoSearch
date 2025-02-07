@@ -42,7 +42,7 @@ class ChadoSearchExactly2Pages extends ChadoSearchPluginBase implements ChadoSea
    *
    * @var array
    */
-  public static $info = [
+  public static array $info = [
     // Lists the columns in your results table.
     'fields' => [
       'column1' => [
