@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\chado_search\Functional;
+namespace Drupal\Tests\trpcultivate_chadosearch\Functional;
 
 use Drupal\Core\Url;
 use Drupal\Tests\tripal_chado\Functional\ChadoTestBrowserBase;
@@ -40,7 +40,7 @@ class InstallTest extends ChadoTestBrowserBase {
    *
    * @var string
    */
-  protected static string $module_machinename = 'chado_search';
+  protected static string $module_machinename = 'trpcultivate_chadosearch';
 
   /**
    * {@inheritdoc}

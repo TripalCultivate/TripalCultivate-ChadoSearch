@@ -1,0 +1,4 @@
+services:
+  trpcultivate_chadosearch.manager:
+    class: Drupal\trpcultivate_chadosearch\Services\ChadoSearchManager
+    parent: default_plugin_manager

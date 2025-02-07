@@ -1,11 +1,11 @@
 <?php
 
-namespace Drupal\chado_search\ChadoSearch\Annotation;
+namespace Drupal\trpcultivate_chadosearch\ChadoSearch\Annotation;
 
 use Drupal\Component\Annotation\Plugin;
 
 /**
- * Defines chado_search annotation object.
+ * Defines trpcultivate_chadosearch annotation object.
  *
  * @Annotation
  */

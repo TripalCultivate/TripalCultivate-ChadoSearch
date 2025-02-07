@@ -1,10 +1,9 @@
 ![Tripal Dependency](https://img.shields.io/badge/tripal-%3E=4.0-brightgreen)
 ![Module is Generic](https://img.shields.io/badge/generic-confirmed-brightgreen)
-![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/UofS-Pulse-Binfo/chado_custom_search?include_prereleases)
+![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/TripalCultivate/TripalCultivate-ChadoSearch?include_prereleases)
 
-[![Build Status](https://travis-ci.org/UofS-Pulse-Binfo/chado_custom_search.svg?branch=master)](https://travis-ci.org/UofS-Pulse-Binfo/chado_custom_search)
-[![Maintainability](https://api.codeclimate.com/v1/badges/69080fdb30c5c3a46350/maintainability)](https://codeclimate.com/github/UofS-Pulse-Binfo/chado_custom_search/maintainability)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/69080fdb30c5c3a46350/test_coverage)](https://codeclimate.com/github/UofS-Pulse-Binfo/chado_custom_search/test_coverage)
+[![Maintainability](https://api.codeclimate.com/v1/badges/4e809649e4f889502aca/maintainability)](https://codeclimate.com/github/TripalCultivate/TripalCultivate-ChadoSearch/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/4e809649e4f889502aca/test_coverage)](https://codeclimate.com/github/TripalCultivate/TripalCultivate-ChadoSearch/test_coverage)
 
 # Chado Custom Search
 
@@ -20,7 +19,7 @@ Why might you want to use this module?
 
 ## Chado Custom Search API
 
-1. Implement the ChadoSearch plugin type by creating a class extending ChadoSearchBase at `src/Plugin/ChadoSearch`. At a minimum you need to set the annotations, the $info property and the getQuery() method. See [BreedingCrossSearch](https://github.com/UofS-Pulse-Binfo/chado_custom_search/blob/master/example_ccsearch/srcPlugin/ChadoSearch/BreedingCrossSearch.inc) for an example.
+1. Implement the ChadoSearch plugin type by creating a class extending ChadoSearchBase at `src/Plugin/ChadoSearch`. At a minimum you need to set the annotations, the $info property and the getQuery() method. See [BreedingCrossSearch](https://github.com/TripalCultivate/TripalCultivate-ChadoSearch/blob/master/example_ccsearch/srcPlugin/ChadoSearch/BreedingCrossSearch.inc) for an example.
 
 2. Clear the cache, navigate to the path defined in the class and enjoy your custom search!
 
@@ -32,7 +31,7 @@ For example, if you publish your site in a journal then this citation should be
 in the reference section and anywhere functionality provided by this module is
 discussed in the above text should reference it.
 
-> Lacey-Anne Sanderson (2024). Chado Search API. Development Version. University of Saskatchewan, Pulse Crop Research Group, Saskatoon, SK, Canada.
+> Lacey-Anne Sanderson (2024). Tripal Cultivate Chado Search. Development Version. University of Saskatchewan, Pulse Crop Research Group, Saskatoon, SK, Canada.
 
 ## Technology Stack
 
@@ -58,8 +57,8 @@ PHPUnit for testing and CodeClimate to ensure good test coverage and
 maintainability. There are more details on [our CodeClimate project page]
 describing our specific maintainability issues and test coverage.
 
-[![Maintainability](https://api.codeclimate.com/v1/badges/69080fdb30c5c3a46350/maintainability)](https://codeclimate.com/github/UofS-Pulse-Binfo/chado_custom_search/maintainability)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/69080fdb30c5c3a46350/test_coverage)](https://codeclimate.com/github/UofS-Pulse-Binfo/chado_custom_search/test_coverage)
+[![Maintainability](https://api.codeclimate.com/v1/badges/69080fdb30c5c3a46350/maintainability)](https://codeclimate.com/github/TripalCultivate/TripalCultivate-ChadoSearch/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/69080fdb30c5c3a46350/test_coverage)](https://codeclimate.com/github/TripalCultivate/TripalCultivate-ChadoSearch/test_coverage)
 
 The following compatibility is proven via automated testing workflows.
 
@@ -69,12 +68,12 @@ The following compatibility is proven via automated testing workflows.
 | **PHP 8.2** | ![Grid1B-Badge] |                 |                 |
 | **PHP 8.3** | ![Grid1C-Badge] | ![Grid2C-Badge] | ![Grid3C-Badge] |
 
-[our CodeClimate project page]: https://codeclimate.com/github/UofS-Pulse-Binfo/chado_custom_search
+[our CodeClimate project page]: https://codeclimate.com/github/TripalCultivate/TripalCultivate-ChadoSearch
 
-[Grid1A-Badge]: https://github.com/UofS-Pulse-Binfo/chado_custom_search/actions/workflows/MAIN-phpunit-Grid1A.yml/badge.svg
-[Grid1B-Badge]: https://github.com/UofS-Pulse-Binfo/chado_custom_search/actions/workflows/MAIN-phpunit-Grid1B.yml/badge.svg
-[Grid1C-Badge]: https://github.com/UofS-Pulse-Binfo/chado_custom_search/actions/workflows/MAIN-phpunit-Grid1C.yml/badge.svg
+[Grid1A-Badge]: https://github.com/TripalCultivate/TripalCultivate-ChadoSearch/actions/workflows/MAIN-phpunit-Grid1A.yml/badge.svg
+[Grid1B-Badge]: https://github.com/TripalCultivate/TripalCultivate-ChadoSearch/actions/workflows/MAIN-phpunit-Grid1B.yml/badge.svg
+[Grid1C-Badge]: https://github.com/TripalCultivate/TripalCultivate-ChadoSearch/actions/workflows/MAIN-phpunit-Grid1C.yml/badge.svg
 
-[Grid2C-Badge]: https://github.com/UofS-Pulse-Binfo/chado_custom_search/actions/workflows/MAIN-phpunit-Grid2C.yml/badge.svg
+[Grid2C-Badge]: https://github.com/TripalCultivate/TripalCultivate-ChadoSearch/actions/workflows/MAIN-phpunit-Grid2C.yml/badge.svg
 
-[Grid3C-Badge]: https://github.com/UofS-Pulse-Binfo/chado_custom_search/actions/workflows/MAIN-phpunit-Grid3C.yml/badge.svg
+[Grid3C-Badge]: https://github.com/TripalCultivate/TripalCultivate-ChadoSearch/actions/workflows/MAIN-phpunit-Grid3C.yml/badge.svg

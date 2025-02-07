@@ -1,9 +1,9 @@
 <?php
 
-namespace Drupal\Tests\chado_search\Kernel\Validators;
+namespace Drupal\Tests\trpcultivate_chadosearch\Kernel\Validators;
 
-use Drupal\chado_search\ChadoSearch\Interfaces\ChadoSearchInterface;
-use Drupal\chado_search\Services\ChadoSearchManager;
+use Drupal\trpcultivate_chadosearch\ChadoSearch\Interfaces\ChadoSearchInterface;
+use Drupal\trpcultivate_chadosearch\Services\ChadoSearchManager;
 use Drupal\Tests\tripal_chado\Kernel\ChadoTestKernelBase;
 use Drupal\tripal_chado\Database\ChadoConnection;
 use Symfony\Component\HttpFoundation\InputBag;
@@ -13,8 +13,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 /**
  * Tests ChadoSearch Plugin Base functions.
  *
- * @group chado_search
- * @group chado_search_plugin
+ * @group trpcultivate_chadosearch
+ * @group trpcultivate_chadosearch_plugin
  * @group ChadoSearchForm
  */
 class FormBaseTest extends ChadoTestKernelBase {
@@ -29,7 +29,7 @@ class FormBaseTest extends ChadoTestKernelBase {
   /**
    * The ChadoSearch plugin instance being tested.
    *
-   * @var Drupal\chado_search\ChadoSearch\Interfaces\ChadoSearchInterface
+   * @var Drupal\trpcultivate_chadosearch\ChadoSearch\Interfaces\ChadoSearchInterface
    */
   protected ChadoSearchInterface $search_instance;
 
@@ -40,7 +40,7 @@ class FormBaseTest extends ChadoTestKernelBase {
    */
   protected static $modules = [
     'tripal_chado',
-    'chado_search',
+    'trpcultivate_chadosearch',
   ];
 
   /**
@@ -110,7 +110,7 @@ class FormBaseTest extends ChadoTestKernelBase {
     $configuration = [];
     $plugin_id = $instance_info['id'];
     $plugin_definition = $this->plugin_definitions[$plugin_id];
-    $plugin_class = '\Drupal\Tests\chado_search\Fixtures\\' . $instance_info['class'];
+    $plugin_class = '\Drupal\Tests\trpcultivate_chadosearch\Fixtures\\' . $instance_info['class'];
     $this->search_instance = new $plugin_class(
       $configuration,
       $plugin_id,
@@ -122,7 +122,7 @@ class FormBaseTest extends ChadoTestKernelBase {
     $manager = $this->createMock(ChadoSearchManager::class);
     $manager->method('createInstance')
       ->willReturn($this->search_instance);
-    $this->container->set('chado_search.manager', $manager);
+    $this->container->set('trpcultivate_chadosearch.manager', $manager);
   }
 
   /**
@@ -236,12 +236,12 @@ class FormBaseTest extends ChadoTestKernelBase {
 
     // Build the form using the Drupal form builder.
     $form = \Drupal::formBuilder()->getForm(
-      'Drupal\chado_search\Form\ChadoSearchForm',
+      'Drupal\trpcultivate_chadosearch\Form\ChadoSearchForm',
       'basically_base'
     );
     $this->assertIsArray($form, "We expect the form returned to be an array.");
     $this->assertEquals(
-      'chado_search_search',
+      'trpcultivate_chadosearch_search',
       $form['#form_id'],
       'We did not get the form id we expected.'
     );

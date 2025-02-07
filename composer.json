@@ -1,0 +1,29 @@
+{
+  "name": "tripalcultivate/chadosearch",
+  "type": "drupal-module",
+  "description": "A Tripal extension module that provides custom search functionality of Chado for those who don't wish to use Drupal Views.",
+  "keywords": [
+    "tripal",
+    "drupal",
+    "biological-data",
+    "data-search"
+  ],
+  "homepage": "https://github.com/TripalCultivate/TripalCultivate-ChadoSearch",
+  "support": {
+    "issues": "https://github.com/TripalCultivate/TripalCultivate-ChadoSearch/issues"
+  },
+  "license": "GPL-3.0-or-later",
+  "minimum-stability": "dev",
+  "authors": [
+    {
+      "name": "Lacey-Anne Sanderson",
+      "homepage": "https://github.com/laceysanderson/",
+      "role": "Lead Developer"
+    }
+  ],
+  "require": {
+    "php": "^8.3",
+    "drupal/core": "^10.5 | 11",
+    "tripal/tripal": "^4.0-alpha1"
+  }
+}

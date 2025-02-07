@@ -14,8 +14,8 @@ on:
     - cron: '0 2 * * *'
 
 env:
-  PKG_NAME: chado_search
-  MODULES: "chado_search example_ccsearch"
+  PKG_NAME: TripalCultivate-ChadoSearch
+  MODULES: "trpcultivate_chadosearch example_ccsearch"
 
 jobs:
   run-tests:

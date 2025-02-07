@@ -1,9 +1,9 @@
 <?php
 
-namespace Drupal\chado_search\Form;
+namespace Drupal\trpcultivate_chadosearch\Form;
 
-use Drupal\chado_search\ChadoSearch\Interfaces\ChadoSearchInterface;
-use Drupal\chado_search\Services\ChadoSearchManager;
+use Drupal\trpcultivate_chadosearch\ChadoSearch\Interfaces\ChadoSearchInterface;
+use Drupal\trpcultivate_chadosearch\Services\ChadoSearchManager;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
@@ -18,16 +18,16 @@ final class ChadoSearchForm extends FormBase {
   /**
    * The plugin manager for chadosearch plugin instances.
    *
-   * @var \Drupal\chado_search\Services\ChadoSearchManager
+   * @var \Drupal\trpcultivate_chadosearch\Services\ChadoSearchManager
    */
-  protected ChadoSearchManager $chado_search_manager;
+  protected ChadoSearchManager $trpcultivate_chadosearch_manager;
 
   /**
    * The instance powering this search.
    *
-   * @var Drupal\chado_search\ChadoSearch\Interfaces\ChadoSearchInterface
+   * @var Drupal\trpcultivate_chadosearch\ChadoSearch\Interfaces\ChadoSearchInterface
    */
-  protected ChadoSearchInterface $chado_search_instance;
+  protected ChadoSearchInterface $trpcultivate_chadosearch_instance;
 
   /**
    * The requeststack service.
@@ -42,7 +42,7 @@ final class ChadoSearchForm extends FormBase {
    * {@inheritdoc}
    */
   public function getFormId(): string {
-    return 'chado_search_search';
+    return 'trpcultivate_chadosearch_search';
   }
 
   /**
@@ -54,7 +54,7 @@ final class ChadoSearchForm extends FormBase {
   public static function create(ContainerInterface $container) {
     $form = new static();
 
-    $form->setChadoSearchManager($container->get('chado_search.manager'));
+    $form->setChadoSearchManager($container->get('trpcultivate_chadosearch.manager'));
     $form->setPageRequestService($container->get('request_stack'));
 
     return $form;
@@ -63,11 +63,11 @@ final class ChadoSearchForm extends FormBase {
   /**
    * Sets the chado search plugin manager.
    *
-   * @param Drupal\chado_search\Services\ChadoSearchManager $manager
+   * @param Drupal\trpcultivate_chadosearch\Services\ChadoSearchManager $manager
    *   The plugin manager to set.
    */
   public function setChadoSearchManager(ChadoSearchManager $manager) {
-    $this->chado_search_manager = $manager;
+    $this->trpcultivate_chadosearch_manager = $manager;
   }
 
   /**
@@ -86,18 +86,18 @@ final class ChadoSearchForm extends FormBase {
    * @param string $instance_id
    *   The unique id of the ChadoSearch plugin instance for this search.
    *
-   * @return Drupal\chado_search\ChadoSearch\Interfaces\ChadoSearchInterface
+   * @return Drupal\trpcultivate_chadosearch\ChadoSearch\Interfaces\ChadoSearchInterface
    *   The instance powering this search!
    */
   public function getChadoSearchInstance(string $instance_id) {
 
-    if (!isset($this->chado_search_instance)) {
+    if (!isset($this->trpcultivate_chadosearch_instance)) {
       // Get the instance using the plugin manager.
       // We'll save it to a property for use later and also return it.
-      $this->chado_search_instance = $this->chado_search_manager->createInstance($instance_id);
+      $this->trpcultivate_chadosearch_instance = $this->trpcultivate_chadosearch_manager->createInstance($instance_id);
     }
 
-    return $this->chado_search_instance;
+    return $this->trpcultivate_chadosearch_instance;
   }
 
   /**
@@ -120,7 +120,7 @@ final class ChadoSearchForm extends FormBase {
 
     // Add CSS/JS as defined in the class. We do this here so that it can
     // be added to and/or altered in the form method.
-    $form['#attached']['library'][] = 'chado_search/search-form';
+    $form['#attached']['library'][] = 'trpcultivate_chadosearch/search-form';
     foreach ($instance->getLibraries() as $library) {
       $form['#attached']['library'][] = $library;
     }
@@ -177,7 +177,7 @@ final class ChadoSearchForm extends FormBase {
    * {@inheritdoc}
    */
   public function validateForm(array &$form, FormStateInterface $form_state): void {
-    $this->chado_search_instance->validateForm($form, $form_state);
+    $this->trpcultivate_chadosearch_instance->validateForm($form, $form_state);
   }
 
   /**
@@ -192,7 +192,7 @@ final class ChadoSearchForm extends FormBase {
 
       // We want to add the value of each filter to the path.
       $params = [];
-      foreach ($this->chado_search_instance->getDefinedFilters() as $name => $details) {
+      foreach ($this->trpcultivate_chadosearch_instance->getDefinedFilters() as $name => $details) {
         if (is_string($values[$name])) {
           $params[$name] = trim($values[$name]);
         }
@@ -210,7 +210,7 @@ final class ChadoSearchForm extends FormBase {
         }
       }
 
-      $route_name = 'chado_search.form.' . $this->chado_search_instance->id();
+      $route_name = 'trpcultivate_chadosearch.form.' . $this->trpcultivate_chadosearch_instance->id();
       $url = Url::fromRoute($route_name, $params);
       $form_state->setRedirectUrl($url);
     }

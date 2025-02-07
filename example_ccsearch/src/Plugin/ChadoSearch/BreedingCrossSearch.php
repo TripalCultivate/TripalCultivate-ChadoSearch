@@ -2,8 +2,8 @@
 
 namespace Drupal\example_ccsearch\Plugin\ChadoSearch;
 
-use Drupal\chado_search\ChadoSearch\Interfaces\ChadoSearchInterface;
-use Drupal\chado_search\ChadoSearch\ChadoSearchPluginBase;
+use Drupal\trpcultivate_chadosearch\ChadoSearch\Interfaces\ChadoSearchInterface;
+use Drupal\trpcultivate_chadosearch\ChadoSearch\ChadoSearchPluginBase;
 use Drupal\Core\Database\Query\Select;
 
 /**
